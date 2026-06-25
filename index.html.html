@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Diablous — Honor Roll</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-void:       #080810;
+    --bg-card:       #111122;
+    --bg-card-hover: #161630;
+    --border-dim:    rgba(120, 80, 200, 0.18);
+    --border-glow:   rgba(160, 100, 255, 0.45);
+    --gold:          #c8a84b;
+    --gold-bright:   #f0d060;
+    --crimson-glow:  #cc2222;
+    --purple-bright: #a855f7;
+    --text-primary:  #e8e0f0;
+    --text-dim:      #7a7090;
+    --text-muted:    #4a4460;
+    --alliance:      #4a90d9;
+    --horde:         #cc3333;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 40% at 50% 0%, rgba(80,20,160,0.15) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 0% 50%, rgba(100,0,0,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 100% 50%, rgba(60,0,120,0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page-wrap { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* HERO */
+  .hero { text-align: center; padding: 72px 0 48px; }
+
+  .hero-sigil { width: 72px; height: 72px; margin: 0 auto 28px; }
+  .sigil-svg { width: 100%; height: 100%; filter: drop-shadow(0 0 18px rgba(168,85,247,0.6)); }
+
+  .hero-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 11px; letter-spacing: 6px;
+    color: var(--gold); text-transform: uppercase;
+    margin-bottom: 12px; opacity: 0.8;
+  }
+
+  .hero-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 900; line-height: 1.05;
+    background: linear-gradient(160deg, #f0d060 0%, #c8a84b 40%, #a855f7 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 8px;
+  }
+
+  .hero-sub {
+    font-family: 'Cinzel', serif;
+    font-size: 13px; letter-spacing: 3px;
+    color: var(--text-dim); margin-bottom: 40px;
+  }
+
+  /* SETUP PANEL */
+  .setup-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-dim);
+    border-radius: 10px;
+    padding: 32px;
+    max-width: 540px;
+    margin: 0 auto 48px;
+  }
+
+  .setup-panel h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 11px; letter-spacing: 4px;
+    color: var(--gold); text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .setup-intro {
+    font-size: 12px; color: var(--text-dim);
+    line-height: 1.7; margin-bottom: 24px;
+  }
+
+  .field-group { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label {
+    font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--text-dim);
+    font-family: 'Cinzel', serif;
+  }
+  .field input {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-dim);
+    border-radius: 4px; padding: 10px 14px;
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif; font-size: 13px;
+    outline: none; transition: border-color 0.2s; width: 100%;
+  }
+  .field input:focus { border-color: var(--purple-bright); }
+  .field input::placeholder { color: var(--text-muted); }
+
+  .field-hint { font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-top: 3px; }
+  .field-hint a { color: var(--purple-bright); text-decoration: none; }
+  .field-hint a:hover { text-decoration: underline; }
+
+  .divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 20px 0; color: var(--text-muted); font-size: 11px;
+    font-family: 'Cinzel', serif; letter-spacing: 2px;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px;
+    background: var(--border-dim);
+  }
+
+  .btn {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; width: 100%; padding: 13px;
+    border-radius: 5px; cursor: pointer;
+    font-family: 'Cinzel', serif; font-size: 12px;
+    letter-spacing: 3px; text-transform: uppercase;
+    transition: all 0.2s; border: 1px solid;
+  }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #5b21b6, #7c3aed);
+    border-color: rgba(168,85,247,0.4); color: #fff;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #6d28d9, #8b5cf6);
+    box-shadow: 0 0 22px rgba(139,92,246,0.35);
+  }
+
+  .btn-bnet {
+    background: linear-gradient(135deg, #0e6fad, #148ede);
+    border-color: rgba(20,142,222,0.5); color: #fff;
+    margin-bottom: 8px;
+  }
+  .btn-bnet:hover:not(:disabled) {
+    background: linear-gradient(135deg, #1480c4, #1aa0f0);
+    box-shadow: 0 0 22px rgba(20,142,222,0.35);
+  }
+
+  /* STATUS */
+  #status-msg {
+    text-align: center; font-family: 'Cinzel', serif;
+    font-size: 12px; letter-spacing: 2px;
+    padding: 12px 0; min-height: 38px; color: var(--text-dim);
+    white-space: pre-wrap;
+  }
+  #status-msg.error  { color: var(--crimson-glow); }
+  #status-msg.good   { color: #6ee7b7; }
+
+  /* SUMMARY */
+  .summary-bar {
+    display: grid; grid-template-columns: repeat(3,1fr);
+    gap: 16px; margin-bottom: 40px;
+  }
+  .summary-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px; padding: 20px 24px; text-align: center;
+  }
+  .summary-card .val {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.6rem,3vw,2.4rem);
+    font-weight: 700; color: var(--gold-bright, #f0d060); line-height:1; margin-bottom:6px;
+  }
+  .summary-card .lbl {
+    font-family: 'Cinzel', serif; font-size: 9px;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--text-dim);
+  }
+
+  /* SECTION HEAD */
+  .section-head { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .section-head h2 {
+    font-family: 'Cinzel', serif; font-size: 11px;
+    letter-spacing: 5px; text-transform: uppercase; color: var(--gold); white-space: nowrap;
+  }
+  .section-head-line { flex:1; height:1px; background: linear-gradient(to right, var(--border-dim), transparent); }
+
+  /* CHAR GRID */
+  #char-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(300px,1fr)); gap: 16px; }
+
+  .char-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-dim);
+    border-radius: 8px; padding: 24px;
+    position: relative; overflow: hidden;
+    transition: border-color 0.25s, background 0.25s, transform 0.2s;
+  }
+  .char-card::before {
+    content: ''; position: absolute;
+    top:0; left:0; right:0; height:2px;
+    background: linear-gradient(90deg, transparent, var(--class-color,#a855f7), transparent);
+    opacity: 0; transition: opacity 0.25s;
+  }
+  .char-card:hover { border-color: var(--border-glow); background: var(--bg-card-hover); transform: translateY(-2px); }
+  .char-card:hover::before { opacity: 1; }
+
+  .char-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:16px; gap:12px; }
+
+  .char-avatar {
+    width:52px; height:52px; border-radius:4px;
+    border:1px solid var(--border-dim); object-fit:cover; flex-shrink:0;
+  }
+  .char-avatar-placeholder {
+    width:52px; height:52px; border-radius:4px;
+    border:1px solid var(--border-dim);
+    background:rgba(255,255,255,0.04);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; font-size:20px;
+  }
+
+  .char-info { flex:1; }
+  .char-name { font-family:'Cinzel',serif; font-size:16px; font-weight:600; color:var(--text-primary); margin-bottom:3px; }
+  .char-meta { font-size:11px; color:var(--text-dim); letter-spacing:0.5px; }
+
+  .char-faction {
+    font-size:10px; letter-spacing:2px; text-transform:uppercase;
+    padding:3px 8px; border-radius:3px; border:1px solid; flex-shrink:0;
+  }
+  .char-faction.alliance { color:var(--alliance); border-color:rgba(74,144,217,0.3); }
+  .char-faction.horde    { color:var(--horde);    border-color:rgba(204,51,51,0.3); }
+
+  .char-hk-block { display:flex; align-items:baseline; gap:6px; margin-bottom:12px; }
+  .hk-number {
+    font-family:'Cinzel Decorative',serif; font-size:2rem;
+    font-weight:700; color:#f0d060; line-height:1;
+  }
+  .hk-label {
+    font-family:'Cinzel',serif; font-size:9px;
+    letter-spacing:3px; text-transform:uppercase; color:var(--text-dim);
+  }
+
+  .char-stats {
+    display:grid; grid-template-columns:1fr 1fr; gap:8px;
+    border-top:1px solid var(--border-dim); padding-top:14px;
+  }
+  .stat-val { font-family:'Cinzel',serif; font-size:13px; font-weight:600; color:var(--text-primary); }
+  .stat-lbl { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); margin-top:1px; }
+
+  /* CLASS COLORS */
+  .cls-death-knight { --class-color:#C41E3A; }
+  .cls-demon-hunter { --class-color:#A330C9; }
+  .cls-druid        { --class-color:#FF7C0A; }
+  .cls-evoker       { --class-color:#33937F; }
+  .cls-hunter       { --class-color:#AAD372; }
+  .cls-mage         { --class-color:#3FC7EB; }
+  .cls-monk         { --class-color:#00FF98; }
+  .cls-paladin      { --class-color:#F48CBA; }
+  .cls-priest       { --class-color:#FFFFFF; }
+  .cls-rogue        { --class-color:#FFF468; }
+  .cls-shaman       { --class-color:#0070DD; }
+  .cls-warlock      { --class-color:#8788EE; }
+  .cls-warrior      { --class-color:#C69B3A; }
+  .class-name { color: var(--class-color, var(--purple-bright)); }
+
+  #results-section { display:none; }
+
+  .pulse { display:inline-block; animation:pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  @media(max-width:600px) {
+    .summary-bar { grid-template-columns:1fr; }
+    .setup-panel { padding:20px; }
+    #char-grid { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <header class="hero">
+    <div class="hero-sigil">
+      <svg class="sigil-svg" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="36,4 44,28 70,28 49,44 57,68 36,52 15,68 23,44 2,28 28,28" fill="none" stroke="#a855f7" stroke-width="1.5" opacity="0.6"/>
+        <polygon points="36,14 42,30 58,30 45,40 50,56 36,46 22,56 27,40 14,30 30,30" fill="rgba(168,85,247,0.15)" stroke="#c8a84b" stroke-width="1"/>
+        <circle cx="36" cy="36" r="5" fill="#a855f7" opacity="0.8"/>
+      </svg>
+    </div>
+    <p class="hero-eyebrow">Stormscale · EU · Retail</p>
+    <h1 class="hero-title">Diablous</h1>
+    <p class="hero-sub">Honor Roll</p>
+  </header>
+
+  <!-- SETUP -->
+  <div class="setup-panel" id="setup-panel">
+    <h3>Connect to Battle.net</h3>
+    <p class="setup-intro">
+      Enter your Blizzard API Client ID below, then click <strong style="color:var(--text-primary)">Login with Battle.net</strong>.
+      You'll approve access in a popup — this gives the page a real user token so it can read your characters and honorable kills.
+    </p>
+
+    <div class="field-group">
+      <div class="field">
+        <label>Client ID</label>
+        <input type="text" id="client-id" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
+        <span class="field-hint">
+          Get one free at <a href="https://develop.battle.net/access" target="_blank">develop.battle.net/access</a> → Create Client.<br>
+          Set the redirect URI to <strong id="redirect-uri-display" style="color:var(--text-primary)">loading…</strong>
+        </span>
+      </div>
+    </div>
+
+    <button class="btn btn-bnet" id="login-btn" onclick="startBnetLogin()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 3c1.5 0 2.9.45 4.07 1.22L5.22 16.07A7 7 0 0 1 12 5zm0 14a7 7 0 0 1-4.07-1.22l10.85-9.85A7 7 0 0 1 12 19z"/></svg>
+      Login with Battle.net
+    </button>
+
+    <div class="divider">or</div>
+
+    <div class="field-group">
+      <div class="field">
+        <label>Paste Access Token manually</label>
+        <input type="password" id="manual-token" placeholder="Paste token from Battle.net OAuth flow" autocomplete="off" />
+        <span class="field-hint">Advanced: if you already have a <code style="color:var(--purple-bright)">wow.profile</code> scoped user token.</span>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="fetch-btn" onclick="startWithToken()">
+      ⚔ Load Honor Data
+    </button>
+  </div>
+
+  <div id="status-msg"></div>
+
+  <!-- RESULTS -->
+  <div id="results-section">
+    <div class="summary-bar">
+      <div class="summary-card">
+        <div class="val" id="total-hk">—</div>
+        <div class="lbl">Total Honorable Kills</div>
+      </div>
+      <div class="summary-card">
+        <div class="val" id="total-chars">—</div>
+        <div class="lbl">Characters</div>
+      </div>
+      <div class="summary-card">
+        <div class="val" id="top-char">—</div>
+        <div class="lbl">Most Lethal</div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h2>Characters</h2>
+      <div class="section-head-line"></div>
+    </div>
+
+    <div id="char-grid"></div>
+  </div>
+
+</div>
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────
+const REGION     = 'eu';
+const BASE_API   = `https://${REGION}.api.blizzard.com`;
+const OAUTH_BASE = `https://${REGION}.battle.net/oauth`;
+const SCOPE      = 'wow.profile';
+const REDIRECT   = window.location.href.split('?')[0].split('#')[0];
+
+// Show redirect URI so user knows what to put in their Blizzard client
+document.getElementById('redirect-uri-display').textContent = REDIRECT;
+
+// ─── HELPERS ──────────────────────────────────────────────────
+const fmt        = n => n == null ? '—' : Number(n).toLocaleString();
+const classSlug  = name => name?.toLowerCase().replace(/\s+/g, '-') ?? '';
+
+const CLASS_EMOJI = {
+  'death-knight':'💀','demon-hunter':'👁️','druid':'🌿','evoker':'🐉',
+  'hunter':'🏹','mage':'❄️','monk':'☯️','paladin':'⚔️','priest':'✨',
+  'rogue':'🗡️','shaman':'⚡','warlock':'🔮','warrior':'🛡️'
+};
+
+function setStatus(msg, type = '') {
+  const el = document.getElementById('status-msg');
+  el.textContent = msg;
+  el.className = type;
+}
+
+// ─── OAUTH POPUP FLOW ─────────────────────────────────────────
+function startBnetLogin() {
+  const clientId = document.getElementById('client-id').value.trim();
+  if (!clientId) {
+    setStatus('Enter your Client ID first.', 'error');
+    return;
+  }
+
+  // Save clientId and a state token
+  const state = Math.random().toString(36).slice(2);
+  sessionStorage.setItem('bnet_state', state);
+  sessionStorage.setItem('bnet_client_id', clientId);
+
+  const params = new URLSearchParams({
+    client_id:     clientId,
+    redirect_uri:  REDIRECT,
+    response_type: 'token',       // implicit grant — returns token in hash, no server needed
+    scope:         SCOPE,
+    state:         state,
+  });
+
+  const authUrl = `${OAUTH_BASE}/authorize?${params}`;
+
+  // Open popup
+  const popup = window.open(authUrl, 'bnet_auth', 'width=520,height=680,left=200,top=100');
+
+  if (!popup) {
+    // Popup blocked — redirect instead
+    setStatus('Popup blocked. Redirecting…', '');
+    window.location.href = authUrl;
+    return;
+  }
+
+  setStatus('Waiting for Battle.net login…', '');
+
+  // Poll for redirect back to this page in popup
+  const poll = setInterval(() => {
+    try {
+      const hash = popup.location.hash;
+      if (hash && hash.includes('access_token')) {
+        clearInterval(poll);
+        popup.close();
+        const tokenParams = new URLSearchParams(hash.slice(1));
+        const token = tokenParams.get('access_token');
+        const retState = tokenParams.get('state');
+        if (retState !== sessionStorage.getItem('bnet_state')) {
+          setStatus('State mismatch — possible CSRF. Try again.', 'error');
+          return;
+        }
+        runFetch(token);
+      }
+    } catch(e) {
+      // Cross-origin — still waiting
+    }
+    if (popup.closed) {
+      clearInterval(poll);
+      if (document.getElementById('status-msg').textContent === 'Waiting for Battle.net login…') {
+        setStatus('Login window closed without completing.', 'error');
+      }
+    }
+  }, 300);
+}
+
+// Handle redirect back to this page (if popup blocked and we redirected)
+window.addEventListener('load', () => {
+  const hash = window.location.hash;
+  if (hash && hash.includes('access_token')) {
+    const params = new URLSearchParams(hash.slice(1));
+    const token  = params.get('access_token');
+    const state  = params.get('state');
+    // Clear hash without reload
+    history.replaceState(null, '', window.location.pathname);
+    if (token) runFetch(token);
+  }
+});
+
+// ─── MANUAL TOKEN FLOW ────────────────────────────────────────
+function startWithToken() {
+  const token = document.getElementById('manual-token').value.trim();
+  if (!token) {
+    setStatus('Paste an access token first, or use Login with Battle.net above.', 'error');
+    return;
+  }
+  runFetch(token);
+}
+
+// ─── MAIN FETCH ───────────────────────────────────────────────
+async function runFetch(token) {
+  document.getElementById('fetch-btn').disabled = true;
+  document.getElementById('login-btn').disabled = true;
+  document.getElementById('results-section').style.display = 'none';
+  setStatus('Fetching account characters…', '');
+
+  try {
+    const chars = await getAccountChars(token);
+
+    if (!chars.length) {
+      setStatus('No characters found on this account.', 'error');
+      return;
+    }
+
+    document.getElementById('results-section').style.display = 'block';
+    document.getElementById('total-chars').textContent = chars.length;
+
+    const grid = document.getElementById('char-grid');
+    grid.innerHTML = chars.map(c =>
+      `<div id="card-${c.id || c.name?.toLowerCase()}">${renderCard(c, null, true)}</div>`
+    ).join('');
+
+    setStatus(`Loading PvP data for ${chars.length} character${chars.length !== 1 ? 's' : ''}…`, '');
+
+    // Fetch PvP data for all chars in parallel
+    const results = await Promise.allSettled(
+      chars.map(async c => {
+        const realm = c.realm?.slug ?? 'stormscale';
+        const name  = c.name?.toLowerCase();
+        const ns    = `profile-${REGION}`;
+
+        const [profRes, pvpRes] = await Promise.all([
+          fetch(`${BASE_API}/profile/wow/character/${realm}/${name}?namespace=${ns}&locale=en_GB`,
+            { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${BASE_API}/profile/wow/character/${realm}/${name}/pvp-summary?namespace=${ns}&locale=en_GB`,
+            { headers: { Authorization: `Bearer ${token}` } })
+        ]);
+
+        const profile = profRes.ok ? await profRes.json() : c;
+        const pvp     = pvpRes.ok  ? await pvpRes.json()  : null;
+        return { profile, pvp };
+      })
+    );
+
+    let totalHK = 0;
+    let topChar = { name: '—', hk: -1 };
+
+    results.forEach((r, i) => {
+      const profile = r.status === 'fulfilled' ? r.value.profile : chars[i];
+      const pvp     = r.status === 'fulfilled' ? r.value.pvp     : null;
+      const hk      = pvp?.honorable_kills ?? 0;
+      totalHK += hk;
+      if (hk > topChar.hk) topChar = { name: profile?.name ?? '—', hk };
+
+      const key = chars[i].id || chars[i].name?.toLowerCase();
+      const el  = document.getElementById(`card-${key}`);
+      if (el) el.innerHTML = renderCard(profile, pvp, false);
+    });
+
+    document.getElementById('total-hk').textContent  = fmt(totalHK);
+    document.getElementById('top-char').textContent   = topChar.name;
+
+    // Sort by HK desc
+    const cards = [...grid.children];
+    cards.sort((a, b) => {
+      const aHK = parseInt(a.querySelector('.hk-number')?.textContent?.replace(/,/g,'') ?? '0') || 0;
+      const bHK = parseInt(b.querySelector('.hk-number')?.textContent?.replace(/,/g,'') ?? '0') || 0;
+      return bHK - aHK;
+    });
+    cards.forEach(c => grid.appendChild(c));
+
+    setStatus(`✓ Loaded ${chars.length} characters`, 'good');
+
+  } catch(err) {
+    setStatus('⚠ ' + err.message, 'error');
+  } finally {
+    document.getElementById('fetch-btn').disabled = false;
+    document.getElementById('login-btn').disabled = false;
+  }
+}
+
+// ─── GET ACCOUNT CHARACTERS ───────────────────────────────────
+async function getAccountChars(token) {
+  const ns  = `profile-${REGION}`;
+  const res = await fetch(
+    `${BASE_API}/profile/user/wow?namespace=${ns}&locale=en_GB`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(
+      `Account fetch failed (HTTP ${res.status}). ` +
+      (res.status === 401 ? 'Token expired or missing wow.profile scope.' :
+       res.status === 403 ? 'Access denied — make sure your Battle.net client has wow.profile scope.' :
+       body.detail || res.statusText)
+    );
+  }
+
+  const data  = await res.json();
+  const chars = [];
+
+  for (const acct of (data.wow_accounts ?? [])) {
+    for (const c of (acct.characters ?? [])) {
+      if ((c.level ?? 0) >= 10) chars.push(c);
+    }
+  }
+
+  return chars;
+}
+
+// ─── RENDER CARD ──────────────────────────────────────────────
+function renderCard(profile, pvp, isLoading) {
+  const name      = profile?.name ?? '—';
+  const level     = profile?.level ?? '—';
+  const className = profile?.character_class?.name ?? '';
+  const raceName  = profile?.race?.name ?? '';
+  const faction   = profile?.faction?.type?.toLowerCase() ?? '';
+  const realmName = profile?.realm?.name ?? 'Stormscale';
+  const realmSlug = profile?.realm?.slug ?? 'stormscale';
+  const clsSlug   = classSlug(className);
+  const emoji     = CLASS_EMOJI[clsSlug] ?? '⚔️';
+
+  const hk          = pvp?.honorable_kills ?? null;
+  const honorLevel  = pvp?.honor_level ?? null;
+  const honorScore  = pvp?.honor_score ?? null;
+  const brackets    = pvp?.brackets ?? [];
+  const arena2v2    = brackets.find(b => b.bracket?.type === 'ARENA_2v2')?.rating ?? null;
+  const rbg         = brackets.find(b => b.bracket?.type === 'BATTLEGROUND')?.rating ?? null;
+
+  const avatarUrl = profile?.id
+    ? `https://render.worldofwarcraft.com/eu/character/${realmSlug}/${profile.id}/avatar.jpg`
+    : null;
+
+  const factionLabel = faction === 'alliance' ? 'Alliance' : faction === 'horde' ? 'Horde' : '';
+
+  return `
+    <div class="char-card cls-${clsSlug}">
+      <div class="char-header">
+        ${avatarUrl
+          ? `<img class="char-avatar" src="${avatarUrl}" alt="${name}"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+             <div class="char-avatar-placeholder" style="display:none">${emoji}</div>`
+          : `<div class="char-avatar-placeholder">${emoji}</div>`}
+        <div class="char-info">
+          <div class="char-name">${name}</div>
+          <div class="char-meta">
+            <span class="class-name">${className || '—'}</span>${raceName ? ' · ' + raceName : ''}${level ? ' · Lvl ' + level : ''}
+          </div>
+          <div class="char-meta" style="margin-top:2px;color:var(--text-muted)">${realmName}</div>
+        </div>
+        ${factionLabel ? `<div class="char-faction ${faction}">${factionLabel}</div>` : ''}
+      </div>
+
+      <div class="char-hk-block">
+        <div class="hk-number">${isLoading ? '<span class="pulse">…</span>' : fmt(hk)}</div>
+        <div class="hk-label">Honorable Kills</div>
+      </div>
+
+      <div class="char-stats">
+        <div class="stat-item">
+          <div class="stat-val">${honorLevel != null ? honorLevel : '—'}</div>
+          <div class="stat-lbl">Honor Level</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">${honorScore != null ? fmt(honorScore) : '—'}</div>
+          <div class="stat-lbl">Honor Points</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">${arena2v2 != null ? arena2v2 : '—'}</div>
+          <div class="stat-lbl">2v2 Rating</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">${rbg != null ? rbg : '—'}</div>
+          <div class="stat-lbl">RBG Rating</div>
+        </div>
+      </div>
+    </div>`;
+}
+</script>
+</body>
+</html>
