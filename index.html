@@ -1,493 +1,886 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Diablous — Honor Roll</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Diablous · WoW PvP Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet"/>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-  :root {
-    --bg-void:       #080810;
-    --bg-card:       #111122;
-    --bg-card-hover: #161630;
-    --border-dim:    rgba(120, 80, 200, 0.18);
-    --border-glow:   rgba(160, 100, 255, 0.45);
-    --gold:          #c8a84b;
-    --gold-bright:   #f0d060;
-    --crimson-glow:  #cc2222;
-    --purple-bright: #a855f7;
-    --text-primary:  #e8e0f0;
-    --text-dim:      #7a7090;
-    --text-muted:    #4a4460;
-    --alliance:      #4a90d9;
-    --horde:         #cc3333;
-  }
+:root{
+  --bg0:#0b0c10;
+  --bg1:#111318;
+  --bg2:#181b22;
+  --bg3:#1e2230;
+  --border:#2a2f3d;
+  --border2:#333a4d;
+  --accent:#7c5cfc;
+  --accent2:#a78bfa;
+  --gold:#f5c542;
+  --red:#ef4444;
+  --green:#22c55e;
+  --blue:#3b82f6;
+  --text1:#e2e8f0;
+  --text2:#94a3b8;
+  --text3:#4b5563;
+  --horde:#d9534f;
+  --alliance:#5b9bd5;
+  --nav-h:56px;
+}
 
-  html { scroll-behavior: smooth; }
+html{font-size:14px;scroll-behavior:smooth}
+body{background:var(--bg0);color:var(--text1);font-family:'Inter',sans-serif;font-weight:400;min-height:100vh;overflow-x:hidden}
 
-  body {
-    background: var(--bg-void);
-    color: var(--text-primary);
-    font-family: 'Inter', sans-serif;
-    font-weight: 300;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+a{color:inherit;text-decoration:none}
 
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background:
-      radial-gradient(ellipse 80% 40% at 50% 0%, rgba(80,20,160,0.15) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 60% at 0% 50%, rgba(100,0,0,0.08) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 60% at 100% 50%, rgba(60,0,120,0.08) 0%, transparent 60%);
-    pointer-events: none; z-index: 0;
-  }
+/* ── TOPNAV ── */
+.topnav{
+  position:sticky;top:0;z-index:100;
+  height:var(--nav-h);
+  background:rgba(11,12,16,0.92);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(12px);
+  display:flex;align-items:center;
+  padding:0 20px;gap:0;
+}
+.nav-logo{
+  font-family:'Rajdhani',sans-serif;font-size:1.35rem;font-weight:700;
+  color:#fff;letter-spacing:1px;margin-right:32px;white-space:nowrap;
+  display:flex;align-items:center;gap:8px;
+}
+.nav-logo span{color:var(--accent2)}
+.nav-logo svg{width:22px;height:22px}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1}
+.nav-link{
+  padding:6px 12px;border-radius:5px;font-size:13px;font-weight:500;
+  color:var(--text2);transition:all 0.15s;white-space:nowrap;cursor:pointer;
+}
+.nav-link:hover,.nav-link.active{color:var(--text1);background:var(--bg3)}
+.nav-link.active{color:var(--accent2)}
+.nav-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+.search-box{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:6px;padding:6px 12px;
+  font-size:12px;color:var(--text2);cursor:text;
+  transition:border-color 0.15s;min-width:180px;
+}
+.search-box:focus-within{border-color:var(--accent)}
+.search-box input{background:none;border:none;outline:none;color:var(--text1);font-size:12px;width:100%}
+.search-box input::placeholder{color:var(--text3)}
+.login-btn{
+  background:var(--accent);color:#fff;border:none;
+  border-radius:5px;padding:6px 14px;font-size:12px;font-weight:600;
+  cursor:pointer;font-family:'Inter',sans-serif;transition:opacity 0.15s;white-space:nowrap;
+}
+.login-btn:hover{opacity:0.85}
+.region-badge{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:5px;padding:5px 10px;font-size:11px;font-weight:600;
+  color:var(--text2);letter-spacing:1px;
+}
 
-  .page-wrap { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
+/* ── LAYOUT ── */
+.page{max-width:1280px;margin:0 auto;padding:24px 20px 60px}
 
-  .hero { text-align: center; padding: 72px 0 48px; }
-  .hero-sigil { width: 72px; height: 72px; margin: 0 auto 28px; }
-  .sigil-svg { width: 100%; height: 100%; filter: drop-shadow(0 0 18px rgba(168,85,247,0.6)); }
-  .hero-eyebrow { font-family:'Cinzel',serif; font-size:11px; letter-spacing:6px; color:var(--gold); text-transform:uppercase; margin-bottom:12px; opacity:0.8; }
-  .hero-title {
-    font-family:'Cinzel Decorative',serif; font-size:clamp(2.2rem,6vw,4rem); font-weight:900; line-height:1.05;
-    background:linear-gradient(160deg,#f0d060 0%,#c8a84b 40%,#a855f7 100%);
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:8px;
-  }
-  .hero-sub { font-family:'Cinzel',serif; font-size:13px; letter-spacing:3px; color:var(--text-dim); margin-bottom:40px; }
+/* ── SECTION HEADER ── */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-title{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text1);letter-spacing:0.5px}
+.sec-link{font-size:11px;color:var(--accent2);letter-spacing:0.5px}
+.sec-link:hover{text-decoration:underline}
 
-  /* PANEL */
-  .panel {
-    background: var(--bg-card); border: 1px solid var(--border-dim);
-    border-radius: 10px; padding: 32px; max-width: 540px; margin: 0 auto 48px;
-  }
-  .panel h3 { font-family:'Cinzel',serif; font-size:11px; letter-spacing:4px; color:var(--gold); text-transform:uppercase; margin-bottom:8px; }
-  .panel-intro { font-size:12px; color:var(--text-dim); line-height:1.75; margin-bottom:24px; }
-  .panel-intro a { color:var(--purple-bright); text-decoration:none; }
-  .panel-intro a:hover { text-decoration:underline; }
-  .panel-intro code { color:var(--purple-bright); font-size:11px; }
+/* ── TABS ── */
+.tabs{display:flex;gap:2px;margin-bottom:14px;flex-wrap:wrap}
+.tab{
+  padding:5px 12px;border-radius:4px;font-size:11px;font-weight:600;
+  color:var(--text2);cursor:pointer;transition:all 0.15s;letter-spacing:0.3px;
+  border:1px solid transparent;
+}
+.tab:hover{color:var(--text1);background:var(--bg3)}
+.tab.active{color:var(--accent2);background:rgba(124,92,252,0.12);border-color:rgba(124,92,252,0.3)}
 
-  .field-group { display:flex; flex-direction:column; gap:14px; margin-bottom:20px; }
-  .field { display:flex; flex-direction:column; gap:5px; }
-  .field label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-dim); font-family:'Cinzel',serif; }
-  .field input {
-    background:rgba(255,255,255,0.04); border:1px solid var(--border-dim);
-    border-radius:4px; padding:10px 14px; color:var(--text-primary);
-    font-family:'Inter',sans-serif; font-size:13px; outline:none; transition:border-color 0.2s; width:100%;
-  }
-  .field input:focus { border-color:var(--purple-bright); }
-  .field input::placeholder { color:var(--text-muted); }
-  .field-hint { font-size:11px; color:var(--text-muted); line-height:1.5; margin-top:3px; }
-  .field-hint a { color:var(--purple-bright); text-decoration:none; }
+/* ── TABLES ── */
+.tbl-wrap{background:var(--bg1);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:28px}
+table{width:100%;border-collapse:collapse}
+thead th{
+  padding:10px 14px;text-align:left;
+  font-size:10px;font-weight:600;color:var(--text3);letter-spacing:1px;text-transform:uppercase;
+  border-bottom:1px solid var(--border);background:var(--bg2);
+  white-space:nowrap;
+}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.1s;cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--bg3)}
+td{padding:9px 14px;font-size:12px;color:var(--text1);white-space:nowrap}
 
-  .btn {
-    display:flex; align-items:center; justify-content:center; gap:8px;
-    width:100%; padding:13px; border-radius:5px; cursor:pointer;
-    font-family:'Cinzel',serif; font-size:12px; letter-spacing:3px;
-    text-transform:uppercase; transition:all 0.2s; border:1px solid;
-  }
-  .btn:disabled { opacity:0.45; cursor:not-allowed; }
-  .btn-bnet {
-    background:linear-gradient(135deg,#0e6fad,#148ede);
-    border-color:rgba(20,142,222,0.5); color:#fff;
-  }
-  .btn-bnet:hover:not(:disabled) { background:linear-gradient(135deg,#1480c4,#1aa0f0); box-shadow:0 0 22px rgba(20,142,222,0.35); }
+.rank-cell{color:var(--text3);font-weight:600;font-size:11px;width:36px}
+.rank-cell.top1{color:#f5c542}
+.rank-cell.top2{color:#94a3b8}
+.rank-cell.top3{color:#cd7f32}
 
-  .step-list { counter-reset:steps; display:flex; flex-direction:column; gap:10px; margin-bottom:24px; }
-  .step { counter-increment:steps; display:flex; gap:12px; align-items:flex-start; font-size:12px; color:var(--text-dim); line-height:1.6; }
-  .step::before { content:counter(steps); min-width:22px; height:22px; background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.3); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Cinzel',serif; font-size:10px; color:var(--purple-bright); flex-shrink:0; margin-top:1px; }
-  .step strong { color:var(--text-primary); }
-  .step code { color:var(--purple-bright); font-size:11px; background:rgba(168,85,247,0.1); padding:1px 5px; border-radius:3px; }
+.char-cell{display:flex;align-items:center;gap:8px}
+.char-avatar-sm{
+  width:28px;height:28px;border-radius:3px;
+  border:1px solid var(--border2);object-fit:cover;flex-shrink:0;
+  background:var(--bg3);
+}
+.char-name-cell{font-weight:600;font-size:12px;color:var(--text1)}
+.char-realm-cell{font-size:10px;color:var(--text3)}
 
-  #status-msg {
-    text-align:center; font-family:'Cinzel',serif; font-size:12px; letter-spacing:2px;
-    padding:12px 0; min-height:38px; color:var(--text-dim); white-space:pre-wrap;
-  }
-  #status-msg.error { color:var(--crimson-glow); }
-  #status-msg.good  { color:#6ee7b7; }
+.class-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 
-  .summary-bar { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:40px; }
-  .summary-card { background:var(--bg-card); border:1px solid var(--border-dim); border-radius:6px; padding:20px 24px; text-align:center; }
-  .summary-card .val { font-family:'Cinzel Decorative',serif; font-size:clamp(1.6rem,3vw,2.4rem); font-weight:700; color:#f0d060; line-height:1; margin-bottom:6px; }
-  .summary-card .lbl { font-family:'Cinzel',serif; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--text-dim); }
+.rating-cell{font-weight:700;font-size:13px;color:var(--text1)}
+.rating-high{color:#a78bfa}
+.rating-elite{color:#f5c542}
 
-  .section-head { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
-  .section-head h2 { font-family:'Cinzel',serif; font-size:11px; letter-spacing:5px; text-transform:uppercase; color:var(--gold); white-space:nowrap; }
-  .section-head-line { flex:1; height:1px; background:linear-gradient(to right,var(--border-dim),transparent); }
+.wl-cell{font-size:11px}
+.wl-w{color:var(--green)}
+.wl-l{color:var(--text3)}
 
-  #char-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }
+.faction-dot{width:6px;height:6px;border-radius:50%}
+.alliance{background:var(--alliance)}
+.horde{background:var(--horde)}
 
-  .char-card {
-    background:var(--bg-card); border:1px solid var(--border-dim);
-    border-radius:8px; padding:24px; position:relative; overflow:hidden;
-    transition:border-color 0.25s,background 0.25s,transform 0.2s;
-  }
-  .char-card::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:2px;
-    background:linear-gradient(90deg,transparent,var(--class-color,#a855f7),transparent);
-    opacity:0; transition:opacity 0.25s;
-  }
-  .char-card:hover { border-color:var(--border-glow); background:var(--bg-card-hover); transform:translateY(-2px); }
-  .char-card:hover::before { opacity:1; }
+.diff-pos{color:var(--green);font-weight:600;font-size:11px}
+.diff-neg{color:var(--red);font-weight:600;font-size:11px}
 
-  .char-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:16px; gap:12px; }
-  .char-avatar { width:52px; height:52px; border-radius:4px; border:1px solid var(--border-dim); object-fit:cover; flex-shrink:0; }
-  .char-avatar-placeholder { width:52px; height:52px; border-radius:4px; border:1px solid var(--border-dim); background:rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:20px; }
-  .char-info { flex:1; }
-  .char-name { font-family:'Cinzel',serif; font-size:16px; font-weight:600; color:var(--text-primary); margin-bottom:3px; }
-  .char-meta { font-size:11px; color:var(--text-dim); letter-spacing:0.5px; }
-  .char-faction { font-size:10px; letter-spacing:2px; text-transform:uppercase; padding:3px 8px; border-radius:3px; border:1px solid; flex-shrink:0; }
-  .char-faction.alliance { color:var(--alliance); border-color:rgba(74,144,217,0.3); }
-  .char-faction.horde    { color:var(--horde);    border-color:rgba(204,51,51,0.3); }
+/* ── HERO STATS ── */
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.hero-stat{
+  background:var(--bg1);border:1px solid var(--border);
+  border-radius:8px;padding:16px 20px;
+}
+.hero-stat-val{
+  font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;
+  color:var(--text1);line-height:1;margin-bottom:4px;
+}
+.hero-stat-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.hero-stat-sub{font-size:11px;color:var(--accent2);margin-top:3px}
 
-  .char-hk-block { display:flex; align-items:baseline; gap:6px; margin-bottom:12px; }
-  .hk-number { font-family:'Cinzel Decorative',serif; font-size:2rem; font-weight:700; color:#f0d060; line-height:1; }
-  .hk-label  { font-family:'Cinzel',serif; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--text-dim); }
+/* ── TWO COL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
 
-  .char-stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; border-top:1px solid var(--border-dim); padding-top:14px; }
-  .stat-val { font-family:'Cinzel',serif; font-size:13px; font-weight:600; color:var(--text-primary); }
-  .stat-lbl { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); margin-top:1px; }
+/* ── LOADING / EMPTY ── */
+.skeleton{animation:skeleton 1.4s ease-in-out infinite}
+@keyframes skeleton{0%,100%{opacity:0.4}50%{opacity:1}}
+.skel-row td{background:var(--bg2);border-radius:3px;height:14px;color:transparent;user-select:none}
+.skel-row td::after{content:'⠀⠀⠀⠀⠀⠀⠀⠀'}
 
-  .cls-death-knight { --class-color:#C41E3A; }
-  .cls-demon-hunter { --class-color:#A330C9; }
-  .cls-druid        { --class-color:#FF7C0A; }
-  .cls-evoker       { --class-color:#33937F; }
-  .cls-hunter       { --class-color:#AAD372; }
-  .cls-mage         { --class-color:#3FC7EB; }
-  .cls-monk         { --class-color:#00FF98; }
-  .cls-paladin      { --class-color:#F48CBA; }
-  .cls-priest       { --class-color:#FFFFFF; }
-  .cls-rogue        { --class-color:#FFF468; }
-  .cls-shaman       { --class-color:#0070DD; }
-  .cls-warlock      { --class-color:#8788EE; }
-  .cls-warrior      { --class-color:#C69B3A; }
-  .class-name { color:var(--class-color,var(--purple-bright)); }
+.empty-state{padding:32px;text-align:center;color:var(--text3);font-size:12px}
 
-  #results-section { display:none; }
-  .pulse { display:inline-block; animation:pulse 1.4s ease-in-out infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+/* ── AUTH OVERLAY ── */
+#auth-overlay{
+  position:fixed;inset:0;background:rgba(11,12,16,0.97);
+  z-index:200;display:flex;align-items:center;justify-content:center;
+}
+.auth-card{
+  background:var(--bg1);border:1px solid var(--border);
+  border-radius:12px;padding:40px;width:100%;max-width:460px;
+}
+.auth-logo{
+  font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;
+  color:#fff;text-align:center;margin-bottom:6px;
+}
+.auth-logo span{color:var(--accent2)}
+.auth-sub{text-align:center;font-size:12px;color:var(--text3);margin-bottom:28px;line-height:1.6}
+.auth-sub a{color:var(--accent2)}
+.auth-steps{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:6px;padding:14px 16px;margin-bottom:20px;
+  font-size:11px;color:var(--text2);line-height:2;
+}
+.auth-steps li{list-style:none;display:flex;gap:8px;align-items:flex-start}
+.auth-steps li::before{
+  content:attr(data-n);color:var(--accent2);
+  font-weight:700;min-width:14px;flex-shrink:0;
+}
+.auth-steps code{
+  background:rgba(124,92,252,0.15);color:var(--accent2);
+  padding:1px 5px;border-radius:3px;font-size:10px;
+}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);font-weight:600}
+.field input{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:5px;padding:10px 12px;color:var(--text1);
+  font-family:'Inter',sans-serif;font-size:13px;outline:none;
+  transition:border-color 0.15s;
+}
+.field input:focus{border-color:var(--accent)}
+.field input::placeholder{color:var(--text3)}
+.auth-btn{
+  width:100%;padding:11px;background:var(--accent);border:none;border-radius:5px;
+  color:#fff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;
+  cursor:pointer;transition:opacity 0.15s;margin-top:4px;
+}
+.auth-btn:hover{opacity:0.85}
+.auth-btn:disabled{opacity:0.4;cursor:not-allowed}
+#auth-status{font-size:11px;color:var(--red);text-align:center;min-height:18px;margin-top:10px}
+#auth-status.ok{color:var(--green)}
 
-  @media(max-width:600px) {
-    .summary-bar { grid-template-columns:1fr; }
-    .panel { padding:20px; }
-    #char-grid { grid-template-columns:1fr; }
-  }
+/* ── SEARCH OVERLAY ── */
+#search-overlay{
+  position:fixed;inset:0;background:rgba(11,12,16,0.85);
+  z-index:150;display:none;align-items:flex-start;justify-content:center;padding-top:80px;
+}
+#search-overlay.open{display:flex}
+.search-modal{
+  background:var(--bg1);border:1px solid var(--border2);
+  border-radius:10px;width:100%;max-width:560px;overflow:hidden;
+}
+.search-input-wrap{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.search-input-wrap input{
+  flex:1;background:none;border:none;outline:none;
+  font-size:15px;color:var(--text1);font-family:'Inter',sans-serif;
+}
+.search-input-wrap input::placeholder{color:var(--text3)}
+.search-close{color:var(--text3);cursor:pointer;font-size:18px;line-height:1}
+.search-results{max-height:340px;overflow-y:auto}
+.search-result-row{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 18px;cursor:pointer;transition:background 0.1s;
+  border-bottom:1px solid var(--border);font-size:12px;
+}
+.search-result-row:hover{background:var(--bg3)}
+.search-result-row:last-child{border-bottom:none}
+.search-empty{padding:24px;text-align:center;color:var(--text3);font-size:12px}
+
+/* ── PLAYER PROFILE ── */
+#profile-section{display:none}
+.profile-header{
+  background:var(--bg1);border:1px solid var(--border);
+  border-radius:8px;padding:24px;margin-bottom:20px;
+  display:flex;align-items:center;gap:20px;
+}
+.profile-avatar{
+  width:72px;height:72px;border-radius:6px;
+  border:2px solid var(--border2);object-fit:cover;background:var(--bg3);
+}
+.profile-name{font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#fff}
+.profile-meta{font-size:12px;color:var(--text2);margin-top:4px}
+.profile-back{
+  margin-bottom:16px;display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;color:var(--text2);cursor:pointer;
+}
+.profile-back:hover{color:var(--text1)}
+.profile-brackets{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.bracket-card{
+  background:var(--bg1);border:1px solid var(--border);
+  border-radius:8px;padding:16px;text-align:center;
+}
+.bracket-rating{font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:var(--accent2)}
+.bracket-name{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.bracket-wl{font-size:11px;color:var(--text2);margin-top:4px}
+
+/* CLASS COLORS */
+.cc-death-knight{color:#C41E3A}.cc-demon-hunter{color:#A330C9}.cc-druid{color:#FF7C0A}
+.cc-evoker{color:#33937F}.cc-hunter{color:#AAD372}.cc-mage{color:#3FC7EB}
+.cc-monk{color:#00FF98}.cc-paladin{color:#F48CBA}.cc-priest{color:#d0d0d0}
+.cc-rogue{color:#FFF468}.cc-shaman{color:#0070DD}.cc-warlock{color:#8788EE}
+.cc-warrior{color:#C69B3A}
+.dot-death-knight{background:#C41E3A}.dot-demon-hunter{background:#A330C9}
+.dot-druid{background:#FF7C0A}.dot-evoker{background:#33937F}.dot-hunter{background:#AAD372}
+.dot-mage{background:#3FC7EB}.dot-monk{background:#00FF98}.dot-paladin{background:#F48CBA}
+.dot-priest{background:#d0d0d0}.dot-rogue{background:#FFF468}.dot-shaman{background:#0070DD}
+.dot-warlock{background:#8788EE}.dot-warrior{background:#C69B3A}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .hero-stats{grid-template-columns:1fr 1fr}
+  .two-col{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .profile-brackets{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .hero-stats{grid-template-columns:1fr}
+  .page{padding:16px 12px 60px}
+  .topnav{padding:0 12px}
+}
 </style>
 </head>
 <body>
-<div class="page-wrap">
 
-  <header class="hero">
-    <div class="hero-sigil">
-      <svg class="sigil-svg" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="36,4 44,28 70,28 49,44 57,68 36,52 15,68 23,44 2,28 28,28" fill="none" stroke="#a855f7" stroke-width="1.5" opacity="0.6"/>
-        <polygon points="36,14 42,30 58,30 45,40 50,56 36,46 22,56 27,40 14,30 30,30" fill="rgba(168,85,247,0.15)" stroke="#c8a84b" stroke-width="1"/>
-        <circle cx="36" cy="36" r="5" fill="#a855f7" opacity="0.8"/>
-      </svg>
-    </div>
-    <p class="hero-eyebrow">Stormscale · EU · Retail</p>
-    <h1 class="hero-title">Diablous</h1>
-    <p class="hero-sub">Honor Roll</p>
-  </header>
-
-  <!-- SETUP PANEL (shown before auth) -->
-  <div class="panel" id="setup-panel">
-    <h3>Setup — One Time Only</h3>
-    <p class="panel-intro">
-      Before clicking Login, make sure your Blizzard API client is configured correctly at
-      <a href="https://develop.battle.net/access" target="_blank">develop.battle.net/access</a>:
+<!-- ── AUTH OVERLAY ── -->
+<div id="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-logo">Diabl<span>ous</span> PvP</div>
+    <p class="auth-sub">
+      WoW PvP Tracker · EU · Stormscale<br>
+      Connect your Blizzard account to view leaderboards &amp; character stats
     </p>
-    <div class="step-list">
-      <div class="step">Open your client → <strong>Redirect URIs</strong> → add exactly:<br><code>https://diablouseu.github.io/hk/index.html</code></div>
-      <div class="step">Set <strong>Service Type</strong> to <code>Game Data APIs</code> (not "None")</div>
-      <div class="step">Enter your <strong>Client ID</strong> and <strong>Client Secret</strong> below — they stay in your browser only</div>
-      <div class="step">Click <strong>Login with Battle.net</strong> — approve in the popup, done</div>
+    <ul class="auth-steps">
+      <li data-n="1">At <a href="https://develop.battle.net/access" target="_blank" style="color:var(--accent2)">develop.battle.net</a>, open your client → <strong>Redirect URIs</strong> → add<br><code>https://diablouseu.github.io/hk/index.html</code></li>
+      <li data-n="2">Set <strong>Service Type</strong> to <code>Game Data APIs</code></li>
+      <li data-n="3">Enter credentials below and click Login</li>
+    </ul>
+    <div class="field">
+      <label>Client ID</label>
+      <input type="text" id="cid" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+    </div>
+    <div class="field">
+      <label>Client Secret</label>
+      <input type="password" id="csec" placeholder="••••••••••••••••••••••••••••••••" autocomplete="off"/>
+    </div>
+    <button class="auth-btn" id="login-btn" onclick="doLogin()">Login with Battle.net</button>
+    <div id="auth-status"></div>
+  </div>
+</div>
+
+<!-- ── SEARCH OVERLAY ── -->
+<div id="search-overlay" onclick="if(event.target===this)closeSearch()">
+  <div class="search-modal">
+    <div class="search-input-wrap">
+      <svg width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="search-input" placeholder="Search character name…" oninput="doSearch(this.value)" autocomplete="off"/>
+      <span class="search-close" onclick="closeSearch()">✕</span>
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-empty">Type a character name to search</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── NAV ── -->
+<nav class="topnav">
+  <div class="nav-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent2)" stroke-width="1.5"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+    Diabl<span>ous</span>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link active" onclick="showSection('home')">Activity</a>
+    <a class="nav-link" onclick="showSection('ladder')">Ladder</a>
+    <a class="nav-link" onclick="showSection('myChars')">My Characters</a>
+  </div>
+  <div class="nav-right">
+    <div class="search-box" onclick="openSearch()">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="nav-search-dummy" placeholder="Search player…" readonly style="cursor:pointer"/>
+    </div>
+    <div class="region-badge">EU</div>
+    <button class="login-btn" id="logout-btn" onclick="doLogout()" style="background:var(--bg2);color:var(--text2);border:1px solid var(--border)">Logout</button>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<div class="page">
+
+  <!-- HOME -->
+  <div id="section-home">
+
+    <!-- Hero stats -->
+    <div class="hero-stats" id="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-val" id="hs-chars">—</div><div class="hero-stat-lbl">Characters</div><div class="hero-stat-sub">on this account</div></div>
+      <div class="hero-stat"><div class="hero-stat-val" id="hs-hk">—</div><div class="hero-stat-lbl">Total Honorable Kills</div><div class="hero-stat-sub">across all chars</div></div>
+      <div class="hero-stat"><div class="hero-stat-val" id="hs-top">—</div><div class="hero-stat-lbl">Top Character</div><div class="hero-stat-sub">most HKs</div></div>
+      <div class="hero-stat"><div class="hero-stat-val" id="hs-honor">—</div><div class="hero-stat-lbl">Max Honor Level</div><div class="hero-stat-sub">across all chars</div></div>
     </div>
 
-    <div class="field-group">
-      <div class="field">
-        <label>Client ID</label>
-        <input type="text" id="client-id" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
-      </div>
-      <div class="field">
-        <label>Client Secret</label>
-        <input type="password" id="client-secret" placeholder="••••••••••••••••••••••••••••••••" autocomplete="off" />
-        <span class="field-hint">Used only to exchange the auth code for a token — never stored or sent anywhere except Blizzard.</span>
+    <!-- Activity / top HK -->
+    <div class="sec-head">
+      <div class="sec-title">Honorable Kills — All Characters</div>
+      <div class="tabs" id="hk-tabs">
+        <div class="tab active" onclick="switchHKTab('all',this)">All</div>
+        <div class="tab" onclick="switchHKTab('horde',this)">Horde</div>
+        <div class="tab" onclick="switchHKTab('alliance',this)">Alliance</div>
       </div>
     </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Character</th><th>Class</th><th>Race</th><th>Realm</th>
+          <th>HKs</th><th>Honor Lvl</th><th>2v2</th><th>3v3</th><th>RBG</th>
+        </tr></thead>
+        <tbody id="hk-table-body"></tbody>
+      </table>
+    </div>
 
-    <button class="btn btn-bnet" id="login-btn" onclick="startLogin()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 3c1.5 0 2.9.45 4.07 1.22L5.22 16.07A7 7 0 0 1 12 5zm0 14a7 7 0 0 1-4.07-1.22l10.85-9.85A7 7 0 0 1 12 19z"/></svg>
-      Login with Battle.net
-    </button>
+    <div class="two-col">
+      <!-- Top gainers -->
+      <div>
+        <div class="sec-head"><div class="sec-title">Top Rated</div></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Character</th><th>Rating</th><th>W/L</th></tr></thead>
+            <tbody id="top-rated-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- HK leaders -->
+      <div>
+        <div class="sec-head"><div class="sec-title">HK Leaders</div></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Character</th><th>HKs</th><th>Honor Lvl</th></tr></thead>
+            <tbody id="hk-leaders-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div id="status-msg"></div>
+  <!-- LADDER (Public EU 3v3) -->
+  <div id="section-ladder" style="display:none">
+    <div class="sec-head">
+      <div class="sec-title">EU Ladder — Season Leaderboard</div>
+      <div class="tabs" id="ladder-tabs">
+        <div class="tab active" onclick="switchLadder('3v3',this)">3v3</div>
+        <div class="tab" onclick="switchLadder('2v2',this)">2v2</div>
+        <div class="tab" onclick="switchLadder('rbg',this)">RBG</div>
+        <div class="tab" onclick="switchLadder('shuffle',this)">Shuffle</div>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Character</th><th>Class</th><th>Realm</th>
+          <th>Rating</th><th>W</th><th>L</th><th>Win%</th>
+        </tr></thead>
+        <tbody id="ladder-body"></tbody>
+      </table>
+    </div>
+  </div>
 
-  <div id="results-section">
-    <div class="summary-bar">
-      <div class="summary-card"><div class="val" id="total-hk">—</div><div class="lbl">Total Honorable Kills</div></div>
-      <div class="summary-card"><div class="val" id="total-chars">—</div><div class="lbl">Characters</div></div>
-      <div class="summary-card"><div class="val" id="top-char">—</div><div class="lbl">Most Lethal</div></div>
+  <!-- MY CHARS -->
+  <div id="section-myChars" style="display:none">
+    <div class="sec-head"><div class="sec-title">My Characters</div></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Character</th><th>Class</th><th>Level</th><th>Realm</th>
+          <th>HKs</th><th>Honor Lvl</th><th>2v2</th><th>3v3</th><th>RBG</th>
+        </tr></thead>
+        <tbody id="mychar-body"></tbody>
+      </table>
     </div>
-    <div class="section-head">
-      <h2>Characters</h2>
-      <div class="section-head-line"></div>
+  </div>
+
+  <!-- PROFILE -->
+  <div id="section-profile" style="display:none">
+    <div class="profile-back" onclick="goBack()">← Back</div>
+    <div class="profile-header" id="profile-header"></div>
+    <div class="profile-brackets" id="profile-brackets"></div>
+    <div class="sec-head"><div class="sec-title">PvP Brackets</div></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Bracket</th><th>Rating</th><th>Wins</th><th>Losses</th><th>Win %</th><th>Rank</th></tr></thead>
+        <tbody id="profile-pvp-body"></tbody>
+      </table>
     </div>
-    <div id="char-grid"></div>
   </div>
 
 </div>
+
 <script>
-// ── CONFIG ──────────────────────────────────────────────────────
-const REDIRECT_URI = 'https://diablouseu.github.io/hk/index.html';
-const REGION       = 'eu';
-const BASE_API     = `https://${REGION}.api.blizzard.com`;
+// ── CONFIG ──────────────────────────────────────────
+const REDIRECT = 'https://diablouseu.github.io/hk/index.html';
+const REGION   = 'eu';
+const BASE     = `https://${REGION}.api.blizzard.com`;
+const NS       = `profile-${REGION}`;
 
-// ── HELPERS ─────────────────────────────────────────────────────
-const fmt       = n => n == null ? '—' : Number(n).toLocaleString();
-const classSlug = n => n?.toLowerCase().replace(/\s+/g,'-') ?? '';
-const CLASS_EMOJI = {
-  'death-knight':'💀','demon-hunter':'👁️','druid':'🌿','evoker':'🐉',
-  'hunter':'🏹','mage':'❄️','monk':'☯️','paladin':'⚔️','priest':'✨',
-  'rogue':'🗡️','shaman':'⚡','warlock':'🔮','warrior':'🛡️'
-};
+// ── STATE ───────────────────────────────────────────
+let TOKEN = null;
+let ALL_CHARS = [];
+let CHAR_DATA = []; // enriched with pvp
+let LADDER_CACHE = {};
+let PREV_SECTION = 'home';
 
-function setStatus(msg, type='') {
-  const el = document.getElementById('status-msg');
-  el.textContent = msg; el.className = type;
+// ── HELPERS ─────────────────────────────────────────
+const fmt    = n => n == null ? '—' : Number(n).toLocaleString();
+const pct    = (w,l) => (w+l)===0 ? '—' : Math.round(w/(w+l)*100)+'%';
+const cSlug  = n => n?.toLowerCase().replace(/\s+/g,'-') ?? '';
+const ratingClass = r => r >= 2400 ? 'rating-elite' : r >= 1800 ? 'rating-high' : '';
+const EMOJI = {'death-knight':'💀','demon-hunter':'👁️','druid':'🌿','evoker':'🐉','hunter':'🏹','mage':'❄️','monk':'☯️','paladin':'⚔️','priest':'✨','rogue':'🗡️','shaman':'⚡','warlock':'🔮','warrior':'🛡️'};
+
+function setAuthStatus(msg, ok=false) {
+  const el = document.getElementById('auth-status');
+  el.textContent = msg; el.className = ok ? 'ok' : '';
 }
 
-// ── STEP 1: Redirect to Battle.net authorize ────────────────────
-function startLogin() {
-  const clientId = document.getElementById('client-id').value.trim();
-  const secret   = document.getElementById('client-secret').value.trim();
-  if (!clientId || !secret) { setStatus('Enter both Client ID and Client Secret first.','error'); return; }
-
-  // Save credentials in sessionStorage so they survive the redirect
+// ── AUTH ────────────────────────────────────────────
+function doLogin() {
+  const cid  = document.getElementById('cid').value.trim();
+  const csec = document.getElementById('csec').value.trim();
+  if (!cid || !csec) { setAuthStatus('Enter Client ID and Secret.'); return; }
   const state = Math.random().toString(36).slice(2);
-  sessionStorage.setItem('bnet_state',     state);
-  sessionStorage.setItem('bnet_client_id', clientId);
-  sessionStorage.setItem('bnet_secret',    secret);
-
-  const params = new URLSearchParams({
-    client_id:     clientId,
-    redirect_uri:  REDIRECT_URI,
-    response_type: 'code',
-    scope:         'wow.profile',
-    state,
-  });
-
-  window.location.href = `https://${REGION}.battle.net/oauth/authorize?${params}`;
+  sessionStorage.setItem('st', state);
+  sessionStorage.setItem('ci', cid);
+  sessionStorage.setItem('cs', csec);
+  const p = new URLSearchParams({client_id:cid,redirect_uri:REDIRECT,response_type:'code',scope:'wow.profile',state});
+  window.location.href = `https://${REGION}.battle.net/oauth/authorize?${p}`;
 }
 
-// ── STEP 2: Exchange code for token (on page load after redirect) ─
+function doLogout() {
+  TOKEN = null; ALL_CHARS = []; CHAR_DATA = [];
+  sessionStorage.clear();
+  document.getElementById('auth-overlay').style.display = 'flex';
+}
+
+async function exchangeCode(code) {
+  const cid  = sessionStorage.getItem('ci');
+  const csec = sessionStorage.getItem('cs');
+  const res  = await fetch(`https://${REGION}.battle.net/oauth/token`, {
+    method:'POST',
+    headers:{'Authorization':'Basic '+btoa(`${cid}:${csec}`),'Content-Type':'application/x-www-form-urlencoded'},
+    body:new URLSearchParams({grant_type:'authorization_code',code,redirect_uri:REDIRECT,scope:'wow.profile'})
+  });
+  if (!res.ok) { const e=await res.json().catch(()=>({})); throw new Error(e.error_description||res.statusText); }
+  return (await res.json()).access_token;
+}
+
+// ── INIT ON LOAD ─────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
-  const params   = new URLSearchParams(window.location.search);
-  const code     = params.get('code');
-  const retState = params.get('state');
-  const error    = params.get('error');
+  const params = new URLSearchParams(window.location.search);
+  const code   = params.get('code');
+  const state  = params.get('state');
+  const err    = params.get('error');
+  history.replaceState(null,'',REDIRECT);
 
-  if (error) {
-    setStatus(`⚠ Battle.net error: ${error} — ${params.get('error_description') ?? ''}`, 'error');
-    return;
-  }
+  if (err) { setAuthStatus(`Battle.net: ${params.get('error_description')||err}`); return; }
 
-  if (!code) return; // First load, nothing to do
-
-  // Clean URL
-  history.replaceState(null, '', REDIRECT_URI);
-
-  const savedState    = sessionStorage.getItem('bnet_state');
-  const clientId      = sessionStorage.getItem('bnet_client_id');
-  const clientSecret  = sessionStorage.getItem('bnet_secret');
-
-  if (!clientId || !clientSecret) {
-    setStatus('⚠ Session expired — please log in again.', 'error');
-    return;
-  }
-  if (retState !== savedState) {
-    setStatus('⚠ State mismatch — possible CSRF. Try again.', 'error');
-    return;
-  }
-
-  setStatus('Exchanging auth code for token…');
-
-  try {
-    // Exchange code → token directly from the browser using Basic auth
-    const tokenRes = await fetch(`https://${REGION}.battle.net/oauth/token`, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Basic ' + btoa(`${clientId}:${clientSecret}`),
-        'Content-Type':  'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        grant_type:   'authorization_code',
-        code,
-        redirect_uri: REDIRECT_URI,
-        scope:        'wow.profile',
-      }),
-    });
-
-    if (!tokenRes.ok) {
-      const err = await tokenRes.json().catch(() => ({}));
-      throw new Error(`Token exchange failed (${tokenRes.status}): ${err.error_description || tokenRes.statusText}`);
-    }
-
-    const { access_token } = await tokenRes.json();
-
-    // Clear sensitive session data
-    sessionStorage.removeItem('bnet_state');
-    sessionStorage.removeItem('bnet_client_id');
-    sessionStorage.removeItem('bnet_secret');
-
-    // Hide setup panel
-    document.getElementById('setup-panel').style.display = 'none';
-
-    await runFetch(access_token);
-
-  } catch(err) {
-    setStatus('⚠ ' + err.message, 'error');
+  if (code) {
+    if (state !== sessionStorage.getItem('st')) { setAuthStatus('State mismatch, try again.'); return; }
+    setAuthStatus('Exchanging code…');
+    try {
+      TOKEN = await exchangeCode(code);
+      sessionStorage.removeItem('st');
+      sessionStorage.removeItem('ci');
+      sessionStorage.removeItem('cs');
+      document.getElementById('auth-overlay').style.display = 'none';
+      await loadAll();
+    } catch(e) { setAuthStatus('Token error: '+e.message); }
   }
 });
 
-// ── STEP 3: Fetch characters + HK data ─────────────────────────
-async function runFetch(token) {
-  setStatus('Fetching your characters…');
-  const ns = `profile-${REGION}`;
+// ── LOAD ALL DATA ────────────────────────────────────
+async function loadAll() {
+  showSection('home');
+  renderSkeletons('hk-table-body', 10);
+  renderSkeletons('top-rated-body', 5, 4);
+  renderSkeletons('hk-leaders-body', 5, 4);
+
+  // Get account characters
+  const acctRes = await fetch(`${BASE}/profile/user/wow?namespace=${NS}&locale=en_GB`, {headers:{Authorization:`Bearer ${TOKEN}`}});
+  if (!acctRes.ok) { alert('Failed to load account. Try re-logging.'); return; }
+  const acct = await acctRes.json();
+  ALL_CHARS = [];
+  for (const wa of (acct.wow_accounts||[])) {
+    for (const c of (wa.characters||[])) {
+      if ((c.level||0)>=10) ALL_CHARS.push(c);
+    }
+  }
+
+  // Enrich with pvp data
+  const enriched = await Promise.allSettled(ALL_CHARS.map(async c => {
+    const realm = c.realm?.slug ?? 'stormscale';
+    const name  = c.name?.toLowerCase();
+    const [pr, pvpr] = await Promise.all([
+      fetch(`${BASE}/profile/wow/character/${realm}/${name}?namespace=${NS}&locale=en_GB`,{headers:{Authorization:`Bearer ${TOKEN}`}}),
+      fetch(`${BASE}/profile/wow/character/${realm}/${name}/pvp-summary?namespace=${NS}&locale=en_GB`,{headers:{Authorization:`Bearer ${TOKEN}`}})
+    ]);
+    const profile = pr.ok ? await pr.json() : c;
+    const pvp     = pvpr.ok ? await pvpr.json() : null;
+    return {...c, profile, pvp};
+  }));
+
+  CHAR_DATA = enriched.map((r,i) => r.status==='fulfilled' ? r.value : {...ALL_CHARS[i], profile:ALL_CHARS[i], pvp:null});
+
+  // Hero stats
+  const totalHK  = CHAR_DATA.reduce((s,c)=>s+(c.pvp?.honorable_kills??0),0);
+  const topChar  = CHAR_DATA.reduce((a,b)=>(b.pvp?.honorable_kills??0)>(a.pvp?.honorable_kills??0)?b:a, CHAR_DATA[0]);
+  const maxHonor = CHAR_DATA.reduce((a,b)=>Math.max(a,b.pvp?.honor_level??0),0);
+  document.getElementById('hs-chars').textContent  = fmt(ALL_CHARS.length);
+  document.getElementById('hs-hk').textContent     = fmt(totalHK);
+  document.getElementById('hs-top').textContent    = topChar?.name ?? '—';
+  document.getElementById('hs-honor').textContent  = maxHonor || '—';
+
+  renderHKTable('all');
+  renderTopRated();
+  renderHKLeaders();
+  renderMyChars();
+}
+
+// ── RENDER HELPERS ────────────────────────────────────
+function renderSkeletons(bodyId, rows=10, cols=10) {
+  const el = document.getElementById(bodyId);
+  el.innerHTML = Array(rows).fill(0).map(()=>`<tr class="skel-row skeleton">${Array(cols).fill('<td></td>').join('')}</tr>`).join('');
+}
+
+function charRow(c, rank, showHK=true) {
+  const p  = c.profile || c;
+  const pvp = c.pvp;
+  const name  = p.name||c.name||'—';
+  const realm = p.realm?.slug||c.realm?.slug||'stormscale';
+  const rName = p.realm?.name||c.realm?.name||realm;
+  const cls   = cSlug(p.character_class?.name||'');
+  const emoji = EMOJI[cls]||'⚔️';
+  const fact  = p.faction?.type?.toLowerCase()||'';
+  const hk    = pvp?.honorable_kills??null;
+  const hl    = pvp?.honor_level??null;
+  const bracks= pvp?.brackets??[];
+  const a2    = bracks.find(b=>b.bracket?.type==='ARENA_2v2')?.rating??null;
+  const a3    = bracks.find(b=>b.bracket?.type==='ARENA_3v3')?.rating??null;
+  const rbg   = bracks.find(b=>b.bracket?.type==='BATTLEGROUND')?.rating??null;
+  const rk    = rank<=3 ? `rank-cell top${rank}` : 'rank-cell';
+  const avatar= p.id ? `https://render.worldofwarcraft.com/eu/character/${realm}/${p.id}/avatar.jpg` : null;
+
+  return `<tr onclick="openProfile('${realm}','${name.toLowerCase()}')">
+    <td class="${rk}">${rank}</td>
+    <td><div class="char-cell">
+      ${avatar?`<img class="char-avatar-sm" src="${avatar}" onerror="this.style.opacity=0.2" alt=""/>`:
+               `<div class="char-avatar-sm" style="display:flex;align-items:center;justify-content:center;font-size:14px">${emoji}</div>`}
+      <div>
+        <div class="char-name-cell cc-${cls}">${name}</div>
+        <div class="char-realm-cell">${rName}</div>
+      </div>
+    </div></td>
+    <td><span class="cc-${cls}">${p.character_class?.name||'—'}</span></td>
+    <td style="color:var(--text2)">${p.race?.name||'—'}</td>
+    <td style="color:var(--text3)">${rName}</td>
+    <td class="rating-cell ${hk>=100000?'rating-elite':hk>=10000?'rating-high':''}">${fmt(hk)}</td>
+    <td style="color:var(--text2)">${hl??'—'}</td>
+    <td class="rating-cell ${ratingClass(a2)}">${a2??'—'}</td>
+    <td class="rating-cell ${ratingClass(a3)}">${a3??'—'}</td>
+    <td class="rating-cell ${ratingClass(rbg)}">${rbg??'—'}</td>
+  </tr>`;
+}
+
+function renderHKTable(filter) {
+  let data = [...CHAR_DATA];
+  if (filter==='horde') data=data.filter(c=>(c.profile||c).faction?.type?.toLowerCase()==='horde');
+  if (filter==='alliance') data=data.filter(c=>(c.profile||c).faction?.type?.toLowerCase()==='alliance');
+  data.sort((a,b)=>(b.pvp?.honorable_kills??0)-(a.pvp?.honorable_kills??0));
+  const body = document.getElementById('hk-table-body');
+  if (!data.length) { body.innerHTML=`<tr><td colspan="10" class="empty-state">No characters found</td></tr>`; return; }
+  body.innerHTML = data.map((c,i)=>charRow(c,i+1)).join('');
+}
+
+function renderTopRated() {
+  const data = [...CHAR_DATA].map(c=>{
+    const bracks = c.pvp?.brackets??[];
+    const maxR = Math.max(...bracks.map(b=>b.rating??0), 0);
+    const topB = bracks.reduce((a,b)=>(b.rating??0)>(a?.rating??0)?b:a, null);
+    return {...c, maxRating:maxR, topBracket:topB};
+  }).filter(c=>c.maxRating>0).sort((a,b)=>b.maxRating-a.maxRating).slice(0,8);
+
+  const body = document.getElementById('top-rated-body');
+  if (!data.length) { body.innerHTML=`<tr><td colspan="4" class="empty-state">No rated data</td></tr>`; return; }
+  body.innerHTML = data.map((c,i)=>{
+    const p=c.profile||c; const cls=cSlug(p.character_class?.name||'');
+    const tb=c.topBracket;
+    const w=tb?.season_match_statistics?.won??0;
+    const l=tb?.season_match_statistics?.lost??0;
+    return `<tr onclick="openProfile('${p.realm?.slug||'stormscale'}','${(p.name||c.name||'').toLowerCase()}')">
+      <td class="${i<3?`rank-cell top${i+1}`:'rank-cell'}">${i+1}</td>
+      <td><div class="char-cell">
+        <div class="class-dot dot-${cls}"></div>
+        <div><div class="char-name-cell cc-${cls}">${p.name||c.name||'—'}</div></div>
+      </div></td>
+      <td class="rating-cell ${ratingClass(c.maxRating)}">${fmt(c.maxRating)}</td>
+      <td class="wl-cell"><span class="wl-w">${w}</span><span style="color:var(--text3)"> / </span><span class="wl-l">${l}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderHKLeaders() {
+  const data = [...CHAR_DATA].filter(c=>c.pvp?.honorable_kills>0).sort((a,b)=>(b.pvp?.honorable_kills??0)-(a.pvp?.honorable_kills??0)).slice(0,8);
+  const body = document.getElementById('hk-leaders-body');
+  if (!data.length) { body.innerHTML=`<tr><td colspan="4" class="empty-state">No HK data</td></tr>`; return; }
+  body.innerHTML = data.map((c,i)=>{
+    const p=c.profile||c; const cls=cSlug(p.character_class?.name||'');
+    return `<tr onclick="openProfile('${p.realm?.slug||'stormscale'}','${(p.name||c.name||'').toLowerCase()}')">
+      <td class="${i<3?`rank-cell top${i+1}`:'rank-cell'}">${i+1}</td>
+      <td><div class="char-cell">
+        <div class="class-dot dot-${cls}"></div>
+        <div><div class="char-name-cell cc-${cls}">${p.name||c.name||'—'}</div></div>
+      </div></td>
+      <td class="rating-cell ${(c.pvp?.honorable_kills??0)>=100000?'rating-elite':'rating-high'}">${fmt(c.pvp?.honorable_kills)}</td>
+      <td style="color:var(--text2)">${c.pvp?.honor_level??'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderMyChars() {
+  const data = [...CHAR_DATA].sort((a,b)=>(b.profile?.level||b.level||0)-(a.profile?.level||a.level||0));
+  const body = document.getElementById('mychar-body');
+  if (!data.length) { body.innerHTML=`<tr><td colspan="10" class="empty-state">No characters</td></tr>`; return; }
+  body.innerHTML = data.map((c,i)=>charRow(c,i+1)).join('');
+}
+
+// ── LADDER ───────────────────────────────────────────
+async function switchLadder(bracket, el) {
+  document.querySelectorAll('#ladder-tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderSkeletons('ladder-body',20,8);
+  if (LADDER_CACHE[bracket]) { renderLadderData(LADDER_CACHE[bracket]); return; }
 
   try {
-    const acctRes = await fetch(
-      `${BASE_API}/profile/user/wow?namespace=${ns}&locale=en_GB`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    if (!acctRes.ok) {
-      const body = await acctRes.json().catch(() => ({}));
-      throw new Error(
-        `Account fetch failed (HTTP ${acctRes.status}). ` +
-        (acctRes.status === 401 ? 'Token may be expired.' :
-         acctRes.status === 403 ? 'Token missing wow.profile scope.' :
-         body.detail || acctRes.statusText)
-      );
-    }
-
-    const data  = await acctRes.json();
-    const chars = [];
-    for (const acct of (data.wow_accounts ?? [])) {
-      for (const c of (acct.characters ?? [])) {
-        if ((c.level ?? 0) >= 10) chars.push(c);
-      }
-    }
-
-    if (!chars.length) { setStatus('No characters (level 10+) found.', 'error'); return; }
-
-    document.getElementById('results-section').style.display = 'block';
-    document.getElementById('total-chars').textContent = chars.length;
-
-    const grid = document.getElementById('char-grid');
-    grid.innerHTML = chars.map(c =>
-      `<div id="card-${c.id}">${renderCard(c, null, true)}</div>`
-    ).join('');
-
-    setStatus(`Loading PvP data for ${chars.length} characters…`);
-
-    const results = await Promise.allSettled(
-      chars.map(async c => {
-        const realm = c.realm?.slug ?? 'stormscale';
-        const name  = c.name?.toLowerCase();
-        const [profRes, pvpRes] = await Promise.all([
-          fetch(`${BASE_API}/profile/wow/character/${realm}/${name}?namespace=${ns}&locale=en_GB`,
-            { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${BASE_API}/profile/wow/character/${realm}/${name}/pvp-summary?namespace=${ns}&locale=en_GB`,
-            { headers: { Authorization: `Bearer ${token}` } }),
-        ]);
-        const profile = profRes.ok ? await profRes.json() : c;
-        const pvp     = pvpRes.ok  ? await pvpRes.json()  : null;
-        return { profile, pvp };
-      })
-    );
-
-    let totalHK = 0;
-    let topChar = { name:'—', hk:-1 };
-
-    results.forEach((r, i) => {
-      const profile = r.status === 'fulfilled' ? r.value.profile : chars[i];
-      const pvp     = r.status === 'fulfilled' ? r.value.pvp     : null;
-      const hk      = pvp?.honorable_kills ?? 0;
-      totalHK += hk;
-      if (hk > topChar.hk) topChar = { name: profile?.name ?? '—', hk };
-      const el = document.getElementById(`card-${chars[i].id}`);
-      if (el) el.innerHTML = renderCard(profile, pvp, false);
-    });
-
-    document.getElementById('total-hk').textContent = fmt(totalHK);
-    document.getElementById('top-char').textContent  = topChar.name;
-
-    // Sort by HK desc
-    const cards = [...grid.children];
-    cards.sort((a,b) => {
-      const n = el => parseInt(el.querySelector('.hk-number')?.textContent?.replace(/,/g,'') ?? '0') || 0;
-      return n(b) - n(a);
-    });
-    cards.forEach(c => grid.appendChild(c));
-
-    setStatus(`✓ ${chars.length} characters loaded`, 'good');
-
-  } catch(err) {
-    setStatus('⚠ ' + err.message, 'error');
+    const slugMap = {'3v3':'3v3','2v2':'2v2','rbg':'battlegrounds','shuffle':'shuffle'};
+    const slug = slugMap[bracket]||bracket;
+    const ns = `dynamic-${REGION}`;
+    const url = slug==='shuffle'
+      ? `${BASE}/data/wow/pvp-season/current/pvp-leaderboard/shuffle?namespace=${ns}&locale=en_GB`
+      : `${BASE}/data/wow/pvp-season/current/pvp-leaderboard/${slug}?namespace=${ns}&locale=en_GB`;
+    const res = await fetch(url, {headers:{Authorization:`Bearer ${TOKEN}`}});
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const d = await res.json();
+    LADDER_CACHE[bracket] = (d.entries||[]).slice(0,100);
+    renderLadderData(LADDER_CACHE[bracket]);
+  } catch(e) {
+    document.getElementById('ladder-body').innerHTML=`<tr><td colspan="8" class="empty-state">Failed to load ladder: ${e.message}</td></tr>`;
   }
 }
 
-// ── RENDER CARD ─────────────────────────────────────────────────
-function renderCard(profile, pvp, isLoading) {
-  const name      = profile?.name ?? '—';
-  const level     = profile?.level ?? '—';
-  const className = profile?.character_class?.name ?? '';
-  const raceName  = profile?.race?.name ?? '';
-  const faction   = profile?.faction?.type?.toLowerCase() ?? '';
-  const realmName = profile?.realm?.name ?? 'Stormscale';
-  const realmSlug = profile?.realm?.slug ?? 'stormscale';
-  const slug      = classSlug(className);
-  const emoji     = CLASS_EMOJI[slug] ?? '⚔️';
-  const hk        = pvp?.honorable_kills ?? null;
-  const honorLvl  = pvp?.honor_level ?? null;
-  const honorPts  = pvp?.honor_score ?? null;
-  const brackets  = pvp?.brackets ?? [];
-  const arena     = brackets.find(b=>b.bracket?.type==='ARENA_2v2')?.rating ?? null;
-  const rbg       = brackets.find(b=>b.bracket?.type==='BATTLEGROUND')?.rating ?? null;
-  const avatarUrl = profile?.id ? `https://render.worldofwarcraft.com/eu/character/${realmSlug}/${profile.id}/avatar.jpg` : null;
-  const fLabel    = faction==='alliance'?'Alliance':faction==='horde'?'Horde':'';
-
-  return `
-    <div class="char-card cls-${slug}">
-      <div class="char-header">
-        ${avatarUrl
-          ? `<img class="char-avatar" src="${avatarUrl}" alt="${name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
-             <div class="char-avatar-placeholder" style="display:none">${emoji}</div>`
-          : `<div class="char-avatar-placeholder">${emoji}</div>`}
-        <div class="char-info">
-          <div class="char-name">${name}</div>
-          <div class="char-meta"><span class="class-name">${className||'—'}</span>${raceName?' · '+raceName:''}${level?' · Lvl '+level:''}</div>
-          <div class="char-meta" style="margin-top:2px;color:var(--text-muted)">${realmName}</div>
-        </div>
-        ${fLabel?`<div class="char-faction ${faction}">${fLabel}</div>`:''}
-      </div>
-      <div class="char-hk-block">
-        <div class="hk-number">${isLoading?'<span class="pulse">…</span>':fmt(hk)}</div>
-        <div class="hk-label">Honorable Kills</div>
-      </div>
-      <div class="char-stats">
-        <div class="stat-item"><div class="stat-val">${honorLvl!=null?honorLvl:'—'}</div><div class="stat-lbl">Honor Level</div></div>
-        <div class="stat-item"><div class="stat-val">${honorPts!=null?fmt(honorPts):'—'}</div><div class="stat-lbl">Honor Points</div></div>
-        <div class="stat-item"><div class="stat-val">${arena!=null?arena:'—'}</div><div class="stat-lbl">2v2 Rating</div></div>
-        <div class="stat-item"><div class="stat-val">${rbg!=null?rbg:'—'}</div><div class="stat-lbl">RBG Rating</div></div>
-      </div>
-    </div>`;
+function renderLadderData(entries) {
+  const body = document.getElementById('ladder-body');
+  if (!entries.length) { body.innerHTML=`<tr><td colspan="8" class="empty-state">No data</td></tr>`; return; }
+  body.innerHTML = entries.map((e,i)=>{
+    const name  = e.character?.name||'—';
+    const realm = e.character?.realm?.slug||'—';
+    const rName = e.character?.realm?.name||realm;
+    const cls   = cSlug(e.character?.specialization?.name||'');
+    const rat   = e.rating??0;
+    const w     = e.season_match_statistics?.won??0;
+    const l     = e.season_match_statistics?.lost??0;
+    const rk    = i<3?`rank-cell top${i+1}`:'rank-cell';
+    return `<tr onclick="openProfile('${realm}','${name.toLowerCase()}')">
+      <td class="${rk}">${i+1}</td>
+      <td><div class="char-cell">
+        <div><div class="char-name-cell">${name}</div></div>
+      </div></td>
+      <td style="color:var(--text2);font-size:11px">${e.character?.playable_class?.name||'—'}</td>
+      <td style="color:var(--text3);font-size:11px">${rName}</td>
+      <td class="rating-cell ${ratingClass(rat)}">${fmt(rat)}</td>
+      <td class="wl-cell wl-w">${w}</td>
+      <td class="wl-cell wl-l">${l}</td>
+      <td style="color:var(--text2);font-size:11px">${pct(w,l)}</td>
+    </tr>`;
+  }).join('');
 }
+
+// ── PROFILE ──────────────────────────────────────────
+async function openProfile(realm, name) {
+  PREV_SECTION = document.querySelector('[id^=section-]:not([style*=none])')?.id?.replace('section-','')||'home';
+  showSection('profile');
+  document.getElementById('profile-header').innerHTML = `<div style="color:var(--text3);font-size:12px;padding:20px">Loading ${name}…</div>`;
+  document.getElementById('profile-brackets').innerHTML = '';
+  document.getElementById('profile-pvp-body').innerHTML = '';
+
+  try {
+    const [pr, pvpr] = await Promise.all([
+      fetch(`${BASE}/profile/wow/character/${realm}/${name}?namespace=${NS}&locale=en_GB`,{headers:{Authorization:`Bearer ${TOKEN}`}}),
+      fetch(`${BASE}/profile/wow/character/${realm}/${name}/pvp-summary?namespace=${NS}&locale=en_GB`,{headers:{Authorization:`Bearer ${TOKEN}`}})
+    ]);
+    const p   = pr.ok ? await pr.json() : null;
+    const pvp = pvpr.ok ? await pvpr.json() : null;
+    if (!p) throw new Error('Character not found');
+
+    const cls    = cSlug(p.character_class?.name||'');
+    const avatar = p.id ? `https://render.worldofwarcraft.com/eu/character/${realm}/${p.id}/avatar.jpg` : null;
+    const fact   = p.faction?.type?.toLowerCase()||'';
+
+    document.getElementById('profile-header').innerHTML = `
+      ${avatar?`<img class="profile-avatar" src="${avatar}" onerror="this.style.opacity=0.2"/>`:''}
+      <div>
+        <div class="profile-name cc-${cls}">${p.name}</div>
+        <div class="profile-meta">
+          <span class="cc-${cls}">${p.character_class?.name||''}</span>
+          ${p.race?.name?' · '+p.race.name:''} · Level ${p.level||'—'}
+          · ${p.realm?.name||realm}
+          ${fact?` · <span class="${fact==='alliance'?'cc-mage':'cc-paladin'}">${fact==='alliance'?'Alliance':'Horde'}</span>`:''}
+        </div>
+        <div class="profile-meta" style="margin-top:6px;color:var(--text3)">
+          HKs: <span style="color:var(--gold)">${fmt(pvp?.honorable_kills)}</span>
+          &nbsp;·&nbsp; Honor Level: <span style="color:var(--accent2)">${pvp?.honor_level??'—'}</span>
+          &nbsp;·&nbsp; Honor Points: <span style="color:var(--text2)">${fmt(pvp?.honor_score)}</span>
+        </div>
+      </div>`;
+
+    const brackets = pvp?.brackets??[];
+    const bracketNames = {'ARENA_2v2':'2v2 Arena','ARENA_3v3':'3v3 Arena','BATTLEGROUND':'RBG','ARENA_5v5':'5v5 Arena'};
+
+    document.getElementById('profile-brackets').innerHTML = brackets.slice(0,3).map(b=>{
+      const bname = bracketNames[b.bracket?.type]||b.bracket?.type||'—';
+      const w=b.season_match_statistics?.won??0;
+      const l=b.season_match_statistics?.lost??0;
+      return `<div class="bracket-card">
+        <div class="bracket-rating ${ratingClass(b.rating)}">${b.rating??'—'}</div>
+        <div class="bracket-name">${bname}</div>
+        <div class="bracket-wl">${w}W / ${l}L &nbsp; ${pct(w,l)}</div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('profile-pvp-body').innerHTML = brackets.length
+      ? brackets.map(b=>{
+          const bname=bracketNames[b.bracket?.type]||b.bracket?.type||'—';
+          const w=b.season_match_statistics?.won??0;
+          const l=b.season_match_statistics?.lost??0;
+          return `<tr>
+            <td style="color:var(--text2)">${bname}</td>
+            <td class="rating-cell ${ratingClass(b.rating)}">${b.rating??'—'}</td>
+            <td class="wl-w">${w}</td><td class="wl-l">${l}</td>
+            <td style="color:var(--text2)">${pct(w,l)}</td>
+            <td style="color:var(--text3)">${b.season_match_statistics?.played??'—'}</td>
+          </tr>`;
+        }).join('')
+      : `<tr><td colspan="6" class="empty-state">No rated PvP data</td></tr>`;
+
+  } catch(e) {
+    document.getElementById('profile-header').innerHTML=`<div class="empty-state">Error: ${e.message}</div>`;
+  }
+}
+
+function goBack() { showSection(PREV_SECTION); }
+
+// ── SEARCH ───────────────────────────────────────────
+function openSearch() { document.getElementById('search-overlay').classList.add('open'); document.getElementById('search-input').focus(); }
+function closeSearch() { document.getElementById('search-overlay').classList.remove('open'); document.getElementById('search-input').value=''; document.getElementById('search-results').innerHTML='<div class="search-empty">Type a character name to search</div>'; }
+
+function doSearch(q) {
+  const res = document.getElementById('search-results');
+  if (!q || q.length<2) { res.innerHTML='<div class="search-empty">Type a character name to search</div>'; return; }
+  const matches = CHAR_DATA.filter(c=>{
+    const name=(c.profile||c).name||c.name||'';
+    return name.toLowerCase().includes(q.toLowerCase());
+  }).slice(0,8);
+  if (!matches.length) { res.innerHTML='<div class="search-empty">No characters found</div>'; return; }
+  res.innerHTML = matches.map(c=>{
+    const p=c.profile||c; const cls=cSlug(p.character_class?.name||'');
+    const realm=p.realm?.slug||c.realm?.slug||'stormscale';
+    return `<div class="search-result-row" onclick="closeSearch();openProfile('${realm}','${(p.name||c.name||'').toLowerCase()}')">
+      <div class="class-dot dot-${cls}"></div>
+      <div>
+        <div class="char-name-cell cc-${cls}">${p.name||c.name||'—'}</div>
+        <div class="char-realm-cell">${p.realm?.name||realm} · ${p.character_class?.name||'—'}</div>
+      </div>
+      <div style="margin-left:auto;color:var(--gold);font-size:11px">${fmt(c.pvp?.honorable_kills)} HKs</div>
+    </div>`;
+  }).join('');
+}
+
+// ── SECTION SWITCHING ────────────────────────────────
+function showSection(name) {
+  document.querySelectorAll('[id^=section-]').forEach(s=>s.style.display='none');
+  document.getElementById(`section-${name}`).style.display='';
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  const nl = document.querySelector(`.nav-link[onclick*="${name}"]`);
+  if (nl) nl.classList.add('active');
+  if (name==='ladder' && !LADDER_CACHE['3v3']) {
+    switchLadder('3v3', document.querySelector('#ladder-tabs .tab'));
+  }
+}
+
+function switchHKTab(filter, el) {
+  document.querySelectorAll('#hk-tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderHKTable(filter);
+}
+
+// Keyboard shortcut: / to open search
+document.addEventListener('keydown', e=>{
+  if (e.key==='/' && document.activeElement.tagName!=='INPUT') { e.preventDefault(); openSearch(); }
+  if (e.key==='Escape') closeSearch();
+});
 </script>
 </body>
 </html>
