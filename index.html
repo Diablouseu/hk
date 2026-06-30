@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Diablous.eu · WoW PvP EU Activity</title>
+<meta name="description" content="EU World of Warcraft PvP activity, leaderboards, player profiles and live rating tracking."/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#07080d;--bg1:#0d0f18;--bg2:#111520;--bg3:#181c2b;--bg4:#1d2235;
+  --line:#22263a;--line2:#2a2f47;
+  --acc:#5865f2;--acc2:#818cf8;--acc-glow:rgba(88,101,242,.18);
+  --gold:#f0b429;--green:#34d399;--red:#f87171;--orange:#fb923c;
+  --text1:#e8eaf6;--text2:#8b92b8;--text3:#3d4266;--text4:#5a6080;
+  --horde:#e05555;--ally:#5b9bd5;
+}
+html{font-size:14px;scroll-behavior:smooth}
+body{background:var(--void);color:var(--text1);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font-family:'Inter',sans-serif}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:sticky;top:0;z-index:300;height:52px;
+  background:rgba(7,8,13,.95);border-bottom:1px solid var(--line);
+  backdrop-filter:blur(20px);
+  display:flex;align-items:center;padding:0 18px;gap:0;
+}
+.logo{
+  font-family:'Barlow Condensed',sans-serif;font-size:1.35rem;font-weight:800;
+  letter-spacing:.5px;color:#fff;margin-right:24px;white-space:nowrap;
+  display:flex;align-items:center;gap:7px;cursor:pointer;flex-shrink:0;
+}
+.logo-pulse{width:7px;height:7px;border-radius:50%;background:var(--acc);
+  box-shadow:0 0 0 0 var(--acc);animation:pulse-ring 2s ease-in-out infinite}
+@keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(88,101,242,.6)}70%{box-shadow:0 0 0 6px rgba(88,101,242,0)}100%{box-shadow:0 0 0 0 rgba(88,101,242,0)}}
+.logo-eu{font-size:.75rem;color:var(--acc2);font-weight:500;opacity:.8}
+.nav-links{display:flex;flex:1}
+.nav-a{
+  height:52px;display:flex;align-items:center;padding:0 14px;
+  font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;
+  border-bottom:2px solid transparent;transition:color .15s;white-space:nowrap;
+}
+.nav-a:hover{color:var(--text1)}
+.nav-a.on{color:var(--acc2);border-bottom-color:var(--acc)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.search-pill{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg2);border:1px solid var(--line2);border-radius:6px;
+  padding:6px 12px;cursor:pointer;font-size:12px;color:var(--text3);
+  transition:border-color .15s;min-width:170px;
+}
+.search-pill:hover{border-color:var(--line2);color:var(--text2)}
+.kbd{background:var(--bg3);border:1px solid var(--line2);border-radius:3px;padding:1px 5px;font-size:10px;margin-left:auto}
+.season-chip{
+  background:var(--acc-glow);border:1px solid rgba(88,101,242,.3);
+  border-radius:4px;padding:4px 9px;font-size:10px;font-weight:600;
+  color:var(--acc2);letter-spacing:.8px;white-space:nowrap;
+}
+.refresh-btn{
+  background:var(--bg2);border:1px solid var(--line2);border-radius:5px;
+  padding:5px 10px;font-size:11px;color:var(--text2);cursor:pointer;
+  transition:all .15s;display:flex;align-items:center;gap:5px;
+}
+.refresh-btn:hover{color:var(--text1);border-color:var(--line)}
+.refresh-btn svg{transition:transform .3s}
+.refresh-btn.spinning svg{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── SEARCH MODAL ── */
+.s-overlay{
+  position:fixed;inset:0;background:rgba(7,8,13,.8);z-index:400;
+  display:none;align-items:flex-start;justify-content:center;
+  padding-top:68px;backdrop-filter:blur(6px);
+}
+.s-overlay.open{display:flex}
+.s-box{
+  background:var(--bg2);border:1px solid var(--line2);border-radius:10px;
+  width:100%;max-width:600px;overflow:hidden;
+  box-shadow:0 32px 80px rgba(0,0,0,.7);
+}
+.s-row-top{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.s-row-top input{flex:1;background:none;border:none;outline:none;font-size:15px;color:var(--text1);font-family:'Inter',sans-serif}
+.s-row-top input::placeholder{color:var(--text3)}
+.s-list{max-height:400px;overflow-y:auto}
+.s-item{display:flex;align-items:center;gap:12px;padding:10px 18px;cursor:pointer;transition:background .1s;border-bottom:1px solid var(--line)}
+.s-item:hover{background:var(--bg3)}
+.s-item:last-child{border-bottom:none}
+.s-empty{padding:28px;text-align:center;color:var(--text3);font-size:12px}
+
+/* ── PAGE ── */
+.page{max-width:1340px;margin:0 auto;padding:16px 16px 80px}
+
+/* ── SECTION HEADS ── */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sec-title{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text1)}
+.sec-sub{font-size:10px;color:var(--text3)}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:2px;flex-wrap:wrap}
+.tab{padding:4px 10px;border-radius:4px;font-size:11px;font-weight:500;color:var(--text3);cursor:pointer;transition:all .15s;border:1px solid transparent}
+.tab:hover{color:var(--text2);background:var(--bg3)}
+.tab.on{color:var(--acc2);background:rgba(88,101,242,.12);border-color:rgba(88,101,242,.2)}
+.time-tabs .tab{font-size:10px;padding:3px 8px}
+
+/* ── MAIN GRID ── */
+.main-grid{display:grid;grid-template-columns:1fr 320px;gap:14px;margin-bottom:16px}
+
+/* ── ACTIVITY TABLE (main) ── */
+.panel{background:var(--bg1);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--bg2);gap:10px;flex-wrap:wrap}
+.panel-head-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.panel-title{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text1)}
+.live-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.22);border-radius:3px;padding:2px 7px;font-size:10px;font-weight:600;color:var(--green)}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:lp 1.5s ease-in-out infinite}
+@keyframes lp{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── TABLE ── */
+.tbl-outer{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:640px}
+thead th{
+  padding:8px 12px;text-align:left;font-size:10px;font-weight:600;
+  color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;
+  border-bottom:1px solid var(--line);background:var(--bg2);white-space:nowrap;
+}
+thead th.r{text-align:right}
+tbody tr{border-bottom:1px solid var(--line);transition:background .1s;cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--bg3)}
+td{padding:7px 12px;font-size:12px;white-space:nowrap;vertical-align:middle}
+td.r{text-align:right}
+
+/* TD TYPES */
+.td-rank{width:30px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--text3)}
+.td-rank.g1{color:var(--gold)}.td-rank.g2{color:#94a3b8}.td-rank.g3{color:#b45309}
+.cc{display:flex;align-items:center;gap:8px}
+.av{width:30px;height:30px;border-radius:3px;border:1px solid var(--line2);object-fit:cover;background:var(--bg3);flex-shrink:0}
+.av-ph{width:30px;height:30px;border-radius:3px;border:1px solid var(--line2);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.pname{font-weight:600;font-size:12px}
+.psub{font-size:10px;color:var(--text3);margin-top:1px}
+.td-rating{font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:700;text-align:right}
+.td-rating.elite{color:var(--gold)}.td-rating.hi{color:var(--acc2)}
+.td-diff{font-size:11px;font-weight:700;text-align:right;width:42px}
+.td-diff.pos{color:var(--green)}.td-diff.neg{color:var(--red)}.td-diff.zero{color:var(--text3)}
+.td-wl{font-size:11px;text-align:right}
+.ww{color:var(--green)}.ll{color:var(--text3)}
+.td-lastseen{font-size:10px;color:var(--text3);text-align:right}
+.td-lastseen.recent{color:var(--green)}.td-lastseen.today{color:var(--gold)}
+.td-realm{font-size:10px;color:var(--text3)}
+.td-spec{font-size:10px;color:var(--text2)}
+.cdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* ── SIDE PANELS ── */
+.side-stack{display:flex;flex-direction:column;gap:14px}
+.side-tbl-row{display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;transition:background .1s;border-bottom:1px solid var(--line)}
+.side-tbl-row:hover{background:var(--bg3)}
+.side-tbl-row:last-child{border-bottom:none}
+.side-rank{width:20px;font-size:11px;font-weight:700;color:var(--text3);font-family:'Barlow Condensed',sans-serif;flex-shrink:0;text-align:right}
+.side-rank.g1{color:var(--gold)}.side-rank.g2{color:#94a3b8}.side-rank.g3{color:#b45309}
+.side-info{flex:1;min-width:0}
+.side-name{font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.side-sub{font-size:9px;color:var(--text3);margin-top:1px}
+.side-val{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;flex-shrink:0;text-align:right}
+
+/* ── BOTTOM GRID ── */
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+
+/* ── LADDER SECTION ── */
+.pager{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px}
+.pager-btn{background:var(--bg2);border:1px solid var(--line);border-radius:4px;padding:5px 12px;font-size:11px;color:var(--text2);cursor:pointer;transition:all .15s}
+.pager-btn:hover{border-color:var(--acc);color:var(--acc2)}
+.pager-btn:disabled{opacity:.3;cursor:not-allowed}
+.pager-info{font-size:11px;color:var(--text3)}
+
+/* ── PROFILE SECTION ── */
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);cursor:pointer;margin-bottom:14px;transition:color .15s}
+.back-link:hover{color:var(--text1)}
+.profile-hero{background:var(--bg1);border:1px solid var(--line);border-radius:8px;padding:22px;display:flex;gap:18px;align-items:flex-start;margin-bottom:14px}
+.profile-av{width:76px;height:76px;border-radius:6px;border:2px solid var(--line2);object-fit:cover;background:var(--bg3);flex-shrink:0}
+.profile-name{font-family:'Barlow Condensed',sans-serif;font-size:1.9rem;font-weight:800;line-height:1}
+.profile-meta{font-size:12px;color:var(--text2);margin-top:6px;line-height:1.9}
+.profile-ls{margin-top:6px;font-size:11px}
+.bracks-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.brack-card{background:var(--bg1);border:1px solid var(--line);border-radius:7px;padding:14px;text-align:center}
+.brack-r{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800}
+.brack-name{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+.brack-wl{font-size:10px;color:var(--text2);margin-top:3px}
+
+/* ── STAT CHIPS ── */
+.chips{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.chip{background:var(--bg1);border:1px solid var(--line);border-radius:6px;padding:10px 16px;flex:1;min-width:110px}
+.chip-val{font-family:'Barlow Condensed',sans-serif;font-size:1.35rem;font-weight:800;color:var(--text1);line-height:1}
+.chip-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+
+/* ── LAST-SEEN COLORS ── */
+/* recent=<1h, today=<24h, else dim */
+
+/* ── CLASS COLORS ── */
+.death-knight{color:#C41E3A}.demon-hunter{color:#A330C9}.druid{color:#FF7C0A}
+.evoker{color:#33937F}.hunter{color:#AAD372}.mage{color:#3FC7EB}
+.monk{color:#00FF98}.paladin{color:#F48CBA}.priest{color:#d0d0d0}
+.rogue{color:#FFF468}.shaman{color:#0070DD}.warlock{color:#8788EE}.warrior{color:#C69B3A}
+.dot-death-knight{background:#C41E3A}.dot-demon-hunter{background:#A330C9}
+.dot-druid{background:#FF7C0A}.dot-evoker{background:#33937F}.dot-hunter{background:#AAD372}
+.dot-mage{background:#3FC7EB}.dot-monk{background:#00FF98}.dot-paladin{background:#F48CBA}
+.dot-priest{background:#d0d0d0}.dot-rogue{background:#FFF468}.dot-shaman{background:#0070DD}
+.dot-warlock{background:#8788EE}.dot-warrior{background:#C69B3A}
+
+/* ── SKELETON ── */
+.ske{animation:ske 1.4s ease-in-out infinite}
+@keyframes ske{0%,100%{opacity:.3}50%{opacity:.7}}
+.ske-line{height:11px;border-radius:3px;background:var(--line)}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){.main-grid{grid-template-columns:1fr}.side-stack{display:none}}
+@media(max-width:800px){.bottom-grid{grid-template-columns:1fr}.chips{flex-wrap:wrap}.bracks-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.page{padding:10px 10px 60px}.nav-links .nav-a:nth-child(n+4){display:none}}
+</style>
+</head>
+<body>
+
+<!-- ── SEARCH MODAL ── -->
+<div class="s-overlay" id="s-overlay" onclick="if(event.target===this)closeSearch()">
+  <div class="s-box">
+    <div class="s-row-top">
+      <svg width="15" height="15" fill="none" stroke="var(--text3)" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="s-inp" placeholder="Search player name…" oninput="runSearch(this.value)" autocomplete="off"/>
+      <span style="font-size:11px;color:var(--text3);cursor:pointer" onclick="closeSearch()">ESC</span>
+    </div>
+    <div class="s-list" id="s-list"><div class="s-empty">Start typing to search EU ladder players</div></div>
+  </div>
+</div>
+
+<!-- ── NAV ── -->
+<nav class="topbar">
+  <div class="logo" onclick="showSec('activity')">
+    <div class="logo-pulse"></div>
+    Diablous<span class="logo-eu">.eu</span>
+  </div>
+  <div class="nav-links">
+    <div class="nav-a on" id="nav-activity" onclick="showSec('activity')">Activity</div>
+    <div class="nav-a" id="nav-ladder" onclick="showSec('ladder')">Ladder</div>
+    <div class="nav-a" id="nav-profile" onclick="showSec('profile')" style="display:none">Profile</div>
+  </div>
+  <div class="nav-right">
+    <div class="search-pill" onclick="openSearch()">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Search player
+      <span class="kbd">/</span>
+    </div>
+    <div class="season-chip" id="season-chip">Loading…</div>
+    <button class="refresh-btn" id="refresh-btn" onclick="hardRefresh()">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      Refresh
+    </button>
+  </div>
+</nav>
+
+<!-- ── MAIN PAGE ── -->
+<div class="page">
+
+<!-- ════ ACTIVITY ════ -->
+<div id="sec-activity">
+  <div class="chips" id="stat-chips">
+    <div class="chip"><div class="chip-val" id="chip-3v3">—</div><div class="chip-lbl">3v3 Players</div></div>
+    <div class="chip"><div class="chip-val" id="chip-2v2">—</div><div class="chip-lbl">2v2 Players</div></div>
+    <div class="chip"><div class="chip-val" id="chip-rbg">—</div><div class="chip-lbl">RBG Players</div></div>
+    <div class="chip"><div class="chip-val" id="chip-shuffle">—</div><div class="chip-lbl">Shuffle Players</div></div>
+    <div class="chip"><div class="chip-val" id="chip-top">—</div><div class="chip-lbl">Top Rating</div></div>
+    <div class="chip"><div class="chip-val" id="chip-updated">—</div><div class="chip-lbl">Last Updated</div></div>
+  </div>
+
+  <div class="main-grid">
+    <!-- ACTIVITY FEED -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-head-left">
+          <div class="panel-title">Activity</div>
+          <div class="live-badge"><div class="live-dot"></div>Live</div>
+          <div class="tabs" id="act-bracket-tabs">
+            <div class="tab on" onclick="switchAct('3v3',this)">3v3</div>
+            <div class="tab" onclick="switchAct('2v2',this)">2v2</div>
+            <div class="tab" onclick="switchAct('rbg',this)">RBG</div>
+            <div class="tab" onclick="switchAct('shuffle',this)">Shuffle</div>
+            <div class="tab" onclick="switchAct('blitz',this)">Blitz</div>
+          </div>
+        </div>
+        <div class="tabs time-tabs" id="act-time-tabs">
+          <div class="tab on" onclick="switchTime('3h',this)">3h</div>
+          <div class="tab" onclick="switchTime('12h',this)">12h</div>
+          <div class="tab" onclick="switchTime('24h',this)">24h</div>
+          <div class="tab" onclick="switchTime('week',this)">1 Week</div>
+          <div class="tab" onclick="switchTime('all',this)">All</div>
+        </div>
+      </div>
+      <div class="tbl-outer">
+        <table>
+          <thead><tr>
+            <th style="width:30px">#</th>
+            <th>Spec / Class</th>
+            <th>Name</th>
+            <th class="r">Rating</th>
+            <th class="r">+/-</th>
+            <th class="r">W / L</th>
+            <th class="r">Games</th>
+            <th>Realm</th>
+            <th class="r">Last Seen</th>
+          </tr></thead>
+          <tbody id="act-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SIDE STACK -->
+    <div class="side-stack">
+      <!-- Top Gainers -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Top Gainers <span style="font-size:9px;color:var(--text3);font-weight:400">(24h)</span></div>
+          <div class="tabs" id="gain-tabs">
+            <div class="tab on" onclick="switchGain('3v3',this)">3v3</div>
+            <div class="tab" onclick="switchGain('2v2',this)">2v2</div>
+            <div class="tab" onclick="switchGain('shuffle',this)">Shuf</div>
+          </div>
+        </div>
+        <div id="gain-body"></div>
+      </div>
+      <!-- Top Losers -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Top Losers <span style="font-size:9px;color:var(--text3);font-weight:400">(24h)</span></div>
+          <div class="tabs" id="lose-tabs">
+            <div class="tab on" onclick="switchLose('3v3',this)">3v3</div>
+            <div class="tab" onclick="switchLose('2v2',this)">2v2</div>
+            <div class="tab" onclick="switchLose('shuffle',this)">Shuf</div>
+          </div>
+        </div>
+        <div id="lose-body"></div>
+      </div>
+      <!-- Most Active -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Most Active</div>
+          <div class="tabs" id="active-tabs">
+            <div class="tab on" onclick="switchActive('3v3',this)">3v3</div>
+            <div class="tab" onclick="switchActive('2v2',this)">2v2</div>
+            <div class="tab" onclick="switchActive('shuffle',this)">Shuf</div>
+          </div>
+        </div>
+        <div id="active-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM: Gainers + Losers full tables -->
+  <div class="bottom-grid">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Top Gainers <span style="font-size:9px;color:var(--text3)">(all brackets)</span></div>
+      </div>
+      <div class="tbl-outer">
+        <table>
+          <thead><tr>
+            <th>#</th><th>Name</th><th>Bracket</th><th class="r">Rating</th><th class="r">+/-</th><th>Realm</th>
+          </tr></thead>
+          <tbody id="gainers-full-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Top Losers <span style="font-size:9px;color:var(--text3)">(all brackets)</span></div>
+      </div>
+      <div class="tbl-outer">
+        <table>
+          <thead><tr>
+            <th>#</th><th>Name</th><th>Bracket</th><th class="r">Rating</th><th class="r">+/-</th><th>Realm</th>
+          </tr></thead>
+          <tbody id="losers-full-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ LADDER ════ -->
+<div id="sec-ladder" style="display:none">
+  <div class="sec-head">
+    <div class="sec-title">EU Leaderboard</div>
+    <div class="tabs" id="lad-tabs">
+      <div class="tab on" onclick="switchLadder('3v3',this)">3v3</div>
+      <div class="tab" onclick="switchLadder('2v2',this)">2v2</div>
+      <div class="tab" onclick="switchLadder('rbg',this)">RBG</div>
+      <div class="tab" onclick="switchLadder('shuffle',this)">Shuffle</div>
+      <div class="tab" onclick="switchLadder('blitz',this)">Blitz</div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="tbl-outer">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Name</th><th>Spec / Class</th><th>Realm</th>
+          <th class="r">Rating</th><th class="r">+/-</th>
+          <th class="r">W</th><th class="r">L</th><th class="r">Win%</th><th class="r">Games</th>
+          <th class="r">Last Seen</th>
+        </tr></thead>
+        <tbody id="lad-body"></tbody>
+      </table>
+    </div>
+    <div class="pager" id="lad-pager"></div>
+  </div>
+</div>
+
+<!-- ════ PROFILE ════ -->
+<div id="sec-profile" style="display:none">
+  <div class="back-link" onclick="goBack()">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+    Back
+  </div>
+  <div class="profile-hero" id="prof-hero"></div>
+  <div class="bracks-grid" id="prof-bracks"></div>
+  <div class="panel">
+    <div class="tbl-outer">
+      <table>
+        <thead><tr>
+          <th>Bracket</th><th class="r">Rating</th><th class="r">+/-</th>
+          <th class="r">Wins</th><th class="r">Losses</th><th class="r">Win%</th><th class="r">Games</th>
+        </tr></thead>
+        <tbody id="prof-tbl"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- /page -->
+
+<script>
+// ═══════════════════════════════════════════════════
+//  CONFIG — paste your Blizzard client_credentials
+//  These are public-only scoped (no user data)
+// ═══════════════════════════════════════════════════
+const CLIENT_ID     = 'YOUR_CLIENT_ID';      // ← replace
+const CLIENT_SECRET = 'YOUR_CLIENT_SECRET';  // ← replace
+
+const BASE    = 'https://eu.api.blizzard.com';
+const NS_DYN  = 'dynamic-eu';
+const NS_PROF = 'profile-eu';
+const PAGE_SZ = 100;
+
+// ═══════ STATE ═══════════════════════════════════
+let TOKEN       = null;
+let SEASON      = 39;
+let CACHE       = {};        // bracket → entries[]
+let SNAP        = {};        // localStorage snapshots: bracket → {ts, entries[]}
+let SEARCH_IDX  = [];
+let prevSec     = 'activity';
+let actBracket  = '3v3';
+let actTime     = '3h';
+let ladBracket  = '3v3';
+let ladPage     = 0;
+let LOADED      = {};        // bracket → bool
+
+// ═══════ HELPERS ═════════════════════════════════
+const fmt    = n => n==null?'—':Number(n).toLocaleString();
+const pct    = (w,l) => (w+l)===0?'—':Math.round(w/(w+l)*100)+'%';
+const cs     = n => n?.toLowerCase().replace(/\s+/g,'-')??'';
+const rCls   = r => r>=2700?'elite':r>=2100?'hi':'';
+const rkCls  = i => i===0?'g1':i===1?'g2':i===2?'g3':'';
+const BNAME  = {ARENA_2v2:'2v2',ARENA_3v3:'3v3',BATTLEGROUND:'RBG'};
+const BSLUG  = {'3v3':'3v3','2v2':'2v2','rbg':'battlegrounds','shuffle':'shuffle','blitz':'battlegrounds-blitz'};
+const BLABEL = {'3v3':'3v3 Arena','2v2':'2v2 Arena','rbg':'RBG','shuffle':'Shuffle','blitz':'BG Blitz'};
+const EMOJI  = {'death-knight':'💀','demon-hunter':'👁','druid':'🌿','evoker':'🐉','hunter':'🏹','mage':'❄','monk':'☯','paladin':'⚔','priest':'✨','rogue':'🗡','shaman':'⚡','warlock':'🔮','warrior':'🛡'};
+
+// Last Seen: derive from games count changes + timestamp
+function lastSeenLabel(e, bracket){
+  const key  = `${bracket}:${e.character?.name}:${e.character?.realm?.slug}`;
+  const snap = getSnap(bracket);
+  const prev = snap ? snap.find(x=>x.k===key) : null;
+  const now  = Date.now();
+  const snapAge = snap ? now - (SNAP[bracket]?.ts||0) : null;
+
+  if(!prev) return {label:'Seen today', cls:'today'};
+
+  const games  = (e.season_match_statistics?.won??0)+(e.season_match_statistics?.lost??0);
+  const pgames = prev.g;
+  if(games !== pgames){
+    // Played since last snapshot
+    const minsAgo = Math.round((snapAge||0)/60000);
+    if(minsAgo < 60) return {label:`~${minsAgo}m ago`, cls:'recent'};
+    if(minsAgo < 1440) return {label:`~${Math.round(minsAgo/60)}h ago`, cls:'today'};
+    return {label:`~${Math.round(minsAgo/1440)}d ago`, cls:''};
+  }
+  // No change since snapshot
+  if(!snapAge) return {label:'Today', cls:'today'};
+  if(snapAge < 3600000) return {label:`>${Math.round(snapAge/60000)}m idle`, cls:''};
+  if(snapAge < 86400000) return {label:`>${Math.round(snapAge/3600000)}h idle`, cls:''};
+  return {label:`>${Math.round(snapAge/86400000)}d idle`, cls:''};
+}
+
+function ratingDiff(e, bracket){
+  const key  = `${bracket}:${e.character?.name}:${e.character?.realm?.slug}`;
+  const snap = getSnap(bracket);
+  const prev = snap ? snap.find(x=>x.k===key) : null;
+  if(!prev) return null;
+  return (e.rating??0) - prev.r;
+}
+
+function diffCell(d){
+  if(d===null) return '<td class="td-diff zero">—</td>';
+  if(d===0)   return '<td class="td-diff zero">—</td>';
+  if(d>0)     return `<td class="td-diff pos">+${d}</td>`;
+  return `<td class="td-diff neg">${d}</td>`;
+}
+
+function getSnap(bracket){
+  if(SNAP[bracket]) return SNAP[bracket].entries;
+  try{
+    const raw=localStorage.getItem(`snap_${bracket}`);
+    if(raw){ const p=JSON.parse(raw); SNAP[bracket]=p; return p.entries; }
+  }catch(e){}
+  return null;
+}
+
+function saveSnap(bracket, entries){
+  const data = {
+    ts: Date.now(),
+    entries: entries.map(e=>({
+      k:`${bracket}:${e.character?.name}:${e.character?.realm?.slug}`,
+      r: e.rating??0,
+      g: (e.season_match_statistics?.won??0)+(e.season_match_statistics?.lost??0)
+    }))
+  };
+  SNAP[bracket]=data;
+  try{localStorage.setItem(`snap_${bracket}`,JSON.stringify(data))}catch(e){}
+}
+
+// ═══════ AUTH (client_credentials — public only) ══
+async function getToken(){
+  const r=await fetch('https://eu.battle.net/oauth/token',{
+    method:'POST',
+    headers:{'Authorization':'Basic '+btoa(`${CLIENT_ID}:${CLIENT_SECRET}`),'Content-Type':'application/x-www-form-urlencoded'},
+    body:'grant_type=client_credentials'
+  });
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error_description||r.statusText)}
+  return (await r.json()).access_token;
+}
+
+async function api(url){
+  const r=await fetch(url,{headers:{Authorization:`Bearer ${TOKEN}`}});
+  if(!r.ok)throw new Error(`HTTP ${r.status} — ${url.split('?')[0].split('/').slice(-2).join('/')}`);
+  return r.json();
+}
+
+// ═══════ INIT ════════════════════════════════════
+window.addEventListener('DOMContentLoaded',async()=>{
+  renderSkeletons('act-body',20,9);
+  renderSideSkel('gain-body');renderSideSkel('lose-body');renderSideSkel('active-body');
+  try{
+    TOKEN=await getToken();
+    // Season
+    try{
+      const si=await api(`${BASE}/data/wow/pvp-season/index?namespace=${NS_DYN}&locale=en_GB`);
+      SEASON=si.current_season?.id??si.seasons?.at(-1)?.id??39;
+    }catch(e){SEASON=39}
+    document.getElementById('season-chip').textContent='Midnight S1';
+    // Load all brackets
+    await Promise.all(['3v3','2v2','rbg','shuffle','blitz'].map(b=>loadBracket(b).catch(()=>{})));
+    renderActivity();
+    renderSideAll();
+    renderGainersLosers();
+    updateChips();
+    document.getElementById('chip-updated').textContent=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){
+    document.getElementById('season-chip').textContent='No API key';
+    document.getElementById('act-body').innerHTML=`<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text3)">
+      ⚠ Add your Blizzard API Client ID &amp; Secret to the top of index.html<br>
+      <span style="font-size:10px">Get free keys at <a href="https://develop.battle.net" style="color:var(--acc2)" target="_blank">develop.battle.net</a></span>
+    </td></tr>`;
+  }
+});
+
+// ═══════ LOAD BRACKET ════════════════════════════
+async function loadBracket(bracket){
+  if(LOADED[bracket])return;
+  // If we already have a snapshot, keep it so we can compute diffs against the NEW data
+  const d=await api(`${BASE}/data/wow/pvp-season/${SEASON}/pvp-leaderboard/${BSLUG[bracket]}?namespace=${NS_DYN}&locale=en_GB`);
+  const entries=d.entries||[];
+  // Save old snap only if we have new data
+  if(entries.length && !SNAP[bracket]){
+    // First load — save as snap so subsequent refresh shows diffs
+    saveSnap(bracket, entries);
+  }
+  CACHE[bracket]=entries;
+  LOADED[bracket]=true;
+  // Build search index
+  entries.forEach(e=>{
+    const name=e.character?.name;
+    const realm=e.character?.realm?.slug;
+    if(name&&!SEARCH_IDX.find(x=>x.name===name&&x.realm===realm&&x.bracket===bracket)){
+      SEARCH_IDX.push({
+        name, realm,
+        realmName:e.character?.realm?.name||realm,
+        rating:e.rating,
+        bracket,
+        cls:e.character?.playable_class?.name||''
+      });
+    }
+  });
+}
+
+// ═══════ HARD REFRESH ════════════════════════════
+async function hardRefresh(){
+  const btn=document.getElementById('refresh-btn');
+  btn.classList.add('spinning');
+  // Save current data as new snapshot for diff
+  Object.keys(CACHE).forEach(b=>{ if(CACHE[b]?.length) saveSnap(b,CACHE[b]); });
+  LOADED={};CACHE={};SEARCH_IDX=[];
+  try{
+    TOKEN=await getToken();
+    await Promise.all(['3v3','2v2','rbg','shuffle','blitz'].map(b=>loadBracket(b).catch(()=>{})));
+    renderActivity();renderSideAll();renderGainersLosers();updateChips();
+    document.getElementById('chip-updated').textContent=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){}
+  btn.classList.remove('spinning');
+}
+
+// ═══════ UPDATE CHIPS ════════════════════════════
+function updateChips(){
+  ['3v3','2v2','rbg','shuffle'].forEach(b=>{
+    const el=document.getElementById(`chip-${b}`);
+    if(el)el.textContent=fmt(CACHE[b]?.length);
+  });
+  const top=Math.max(...(CACHE['3v3']||[]).map(e=>e.rating||0),0);
+  document.getElementById('chip-top').textContent=top?fmt(top):'—';
+}
+
+// ═══════ RENDER ACTIVITY ═════════════════════════
+function renderSkeletons(id,rows,cols){
+  document.getElementById(id).innerHTML=Array(rows).fill(0).map(()=>`<tr class="ske">${Array(cols).fill('<td><div class="ske-line" style="width:'+(40+Math.random()*80)+'px"></div></td>').join('')}</tr>`).join('');
+}
+
+function timeFilter(entries, bracket, window){
+  if(window==='all')return entries;
+  const snap=getSnap(bracket);
+  const snapAge=SNAP[bracket]?.ts;
+  const now=Date.now();
+  const limits={'3h':3*3600000,'12h':12*3600000,'24h':24*3600000,'week':7*24*3600000};
+  const limit=limits[window]||Infinity;
+  if(!snap||!snapAge)return entries; // can't filter without snapshot
+  // Only show entries where games changed (i.e., active recently)
+  return entries.filter(e=>{
+    const key=`${bracket}:${e.character?.name}:${e.character?.realm?.slug}`;
+    const prev=snap.find(x=>x.k===key);
+    if(!prev)return true; // new entry = recently active
+    const games=(e.season_match_statistics?.won??0)+(e.season_match_statistics?.lost??0);
+    return games!==prev.g;
+  });
+}
+
+function renderActivity(){
+  const all=CACHE[actBracket]||[];
+  const filtered=timeFilter(all,actBracket,actTime);
+  const body=document.getElementById('act-body');
+  if(!filtered.length){
+    body.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text3)">
+      No activity detected in this window — try "All" or refresh
+    </td></tr>`;return;
+  }
+  body.innerHTML=filtered.slice(0,200).map((e,i)=>{
+    const name=e.character?.name||'—';
+    const realm=e.character?.realm?.slug||'';
+    const realmName=e.character?.realm?.name||realm;
+    const cls=cs(e.character?.playable_class?.name||'');
+    const spec=e.character?.specialization?.name||'';
+    const rat=e.rating||0;
+    const w=e.season_match_statistics?.won??0;
+    const l=e.season_match_statistics?.lost??0;
+    const games=w+l;
+    const diff=ratingDiff(e,actBracket);
+    const {label,cls:lsCls}=lastSeenLabel(e,actBracket);
+    const rank=e.rank??i+1;
+    return `<tr onclick="openProfile('${realm}','${name.toLowerCase()}')">
+      <td class="td-rank ${rkCls(i)}">${rank}</td>
+      <td><div class="cc">
+        <div class="cdot dot-${cls}"></div>
+        <span class="td-spec">${spec||e.character?.playable_class?.name||'—'}</span>
+      </div></td>
+      <td><div class="cc">
+        <div class="av-ph">${EMOJI[cls]||'⚔'}</div>
+        <div><div class="pname ${cls}">${name}</div></div>
+      </div></td>
+      <td class="td-rating ${rCls(rat)} r">${fmt(rat)}</td>
+      ${diffCell(diff)}
+      <td class="td-wl r"><span class="ww">${w}</span> <span class="ll">/ ${l}</span></td>
+      <td class="r" style="color:var(--text3);font-size:11px">${fmt(games)}</td>
+      <td class="td-realm">${realmName}</td>
+      <td class="td-lastseen ${lsCls} r">${label}</td>
+    </tr>`;
+  }).join('');
+}
+
+function switchAct(b,el){
+  document.querySelectorAll('#act-bracket-tabs .tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');actBracket=b;renderActivity();
+}
+function switchTime(t,el){
+  document.querySelectorAll('#act-time-tabs .tab').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');actTime=t;renderActivity();
+}
+
+// ═══════ SIDE PANELS ═════════════════════════════
+function renderSideSkel(id){
+  document.getElementById(id).innerHTML=Array(8).fill(0).map((_,i)=>`
+    <div class="side-tbl-row ske">
+      <div class="side-rank">${i+1}</div>
+      <div class="side-info"><div class="ske-line" style="width:${70+Math.random()*40}px"></div></div>
+      <div class="side-val"><div class="ske-line" style="width:38px"></div></div>
+    </div>`).join('');
+}
+
+function renderSideGain(bracket){
+  const entries=(CACHE[bracket]||[]);
+  const snap=getSnap(bracket);
+  let rows=entries.map(e=>{
+    const key=`${bracket}:${e.character?.name}:${e.character?.realm?.slug}`;
+    const prev=snap?snap.find(x=>x.k===key):null;
+    const diff=prev?(e.rating??0)-prev.r:null;
+    return {...e,diff};
+  }).filter(e=>e.diff>0).sort((a,b)=>b.diff-a.diff).slice(0,8);
+  const body=document.getElementById('gain-body');
+  if(!rows.length){body.innerHTML='<div class="s-empty">No gainers detected yet — refresh to compare</div>';return;}
+  body.innerHTML=rows.map((e,i)=>{
+    const name=e.character?.name||'—'; const realm=e.character?.realm?.slug||'';
+    const cls=cs(e.character?.playable_class?.name||'');
+    return `<div class="side-tbl-row" onclick="openProfile('${realm}','${name.toLowerCase()}')">
+      <div class="side-rank ${rkCls(i)}">${i+1}</div>
+      <div class="av-ph" style="width:22px;height:22px;font-size:10px;flex-shrink:0">${EMOJI[cls]||'⚔'}</div>
+      <div class="side-info"><div class="side-name ${cls}">${name}</div><div class="side-sub">${e.character?.realm?.name||realm}</div></div>
+      <div style="text-align:right;flex-shrink:0"><div class="side-val" style="color:var(--green);font-size:.95rem">+${e.diff}</div><div class="side-sub">${fmt(e.rating)}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderSideLose(bracket){
+  const entries=(CACHE[bracket]||[]);
+  const snap=getSnap(bracket);
+  let rows=entries.map(e=>{
+    const key=`${bracket}:${e.character?.name}:${e.character?.realm?.slug}`;
+    const prev=snap?snap.find(x=>x.k===key):null;
+    const diff=prev?(e.rating??0)-prev.r:null;
+    return {...e,diff};
+  }).filter(e=>e.diff<0).sort((a,b)=>a.diff-b.diff).slice(0,8);
+  const body=document.getElementById('lose-body');
+  if(!rows.length){body.innerHTML='<div class="s-empty">No losers detected yet — refresh to compare</div>';return;}
+  body.innerHTML=rows.map((e,i)=>{
+    const name=e.character?.name||'—'; const realm=e.character?.realm?.slug||'';
+    const cls=cs(e.character?.playable_class?.name||'');
+    return `<div class="side-tbl-row" onclick="openProfile('${realm}','${name.toLowerCase()}')">
+      <div class="side-rank ${rkCls(i)}">${i+1}</div>
+      <div class="av-ph" style="width:22px;height:22px;font-size:10px;flex-shrink:0">${EMOJI[cls]||'⚔'}</div>
+      <div class="side-info"><div class="side-name ${cls}">${name}</div><div class="side-sub">${e.character?.realm?.name||realm}</div></div>
+      <div style="text-align:right;flex-shrink:0"><div class="side-val" style="color:var(--red);font-size:.95rem">${e.diff}</div><div class="side-sub">${fmt(e.rating)}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderSideActive(bracket){
+  const entries=[...(CACHE[bracket]||[])].sort((a,b)=>{
+    const ag=(a.season_match_statistics?.won??0)+(a.season_match_statistics?.lost??0);
+    const bg=(b.season_match_statistics?.won??0)+(b.season_match_statistics?.lost??0);
+    return bg-ag;
+  }).slice(0,8);
+  const body=document.getElementById('active-body');
+  if(!entries.length){body.innerHTML='<div class="s-empty">No data</div>';return;}
+  body.innerHTML=entries.map((e,i)=>{
+    const name=e.character?.name||'—'; const realm=e.character?.realm?.slug||'';
+    const cls=cs(e.character?.playable_class?.name||'');
+    const games=(e.season_match_statistics?.won??0)+(e.season_match_statistics?.lost??0);
+    return `<div class="side-tbl-row" onclick="openProfile('${realm}','${name.toLowerCase()}')">
+      <div class="side-rank ${rkCls(i)}">${i+1}</div>
+      <div class="av-ph" style="width:22px;height:22px;font-size:10px;flex-shrink:0">${EMOJI[cls]||'⚔'}</div>
+      <div class="side-info"><div class="side-name ${cls}">${name}</div><div class="side-sub">${fmt(e.rating)} rating</div></div>
+      <div style="text-align:right;flex-shrink:0"><div class="side-val" style="font-size:.95rem">${fmt(games)}</div><div class="side-sub">games</div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderSideAll(){
+  renderSideGain('3v3');renderSideLose('3v3');renderSideActive('3v3');
+}
+
+function switchGain(b,el){document.querySelectorAll('#gain-tabs .tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');renderSideGain(b)}
+function switchLose(b,el){document.querySelectorAll('#lose-tabs .tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');renderSideLose(b)}
+function switchActive(b,el){document.querySelectorAll('#active-tabs .tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');renderSideActive(b)}
+
+// ═══════ GAINERS/LOSERS FULL ═════════════════════
+function renderGainersLosers(){
+  const all=[];
+  ['3v3','2v2','rbg','shuffle'].forEach(bracket=>{
+    const snap=getSnap(bracket);
+    (CACHE[bracket]||[]).forEach(e=>{
+      const key=`${bracket}:${e.character?.name}:${e.character?.realm?.slug}`;
+      const prev=snap?snap.find(x=>x.k===key):null;
+      const diff=prev?(e.rating??0)-prev.r:null;
+      if(diff!==null&&diff!==0) all.push({...e,diff,bracket});
+    });
+  });
+  const gainers=all.filter(x=>x.diff>0).sort((a,b)=>b.diff-a.diff).slice(0,20);
+  const losers =all.filter(x=>x.diff<0).sort((a,b)=>a.diff-b.diff).slice(0,20);
+  function row(e,i){
+    const name=e.character?.name||'—';const realm=e.character?.realm?.slug||'';
+    const cls=cs(e.character?.playable_class?.name||'');
+    const dCls=e.diff>0?'pos':'neg';
+    return `<tr onclick="openProfile('${realm}','${name.toLowerCase()}')">
+      <td class="td-rank ${rkCls(i)}">${i+1}</td>
+      <td><div class="cc"><div class="cdot dot-${cls}"></div><span class="pname ${cls}">${name}</span></div></td>
+      <td style="font-size:10px;color:var(--text3)">${BLABEL[e.bracket]||e.bracket}</td>
+      <td class="td-rating ${rCls(e.rating)} r">${fmt(e.rating)}</td>
+      <td class="td-diff ${dCls} r">${e.diff>0?'+':''}${e.diff}</td>
+      <td class="td-realm">${e.character?.realm?.name||realm}</td>
+    </tr>`;
+  }
+  document.getElementById('gainers-full-body').innerHTML=gainers.length?gainers.map(row).join(''):`<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">Hit Refresh to start tracking rating changes</td></tr>`;
+  document.getElementById('losers-full-body').innerHTML=losers.length?losers.map(row).join(''):`<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">Hit Refresh to start tracking rating changes</td></tr>`;
+}
+
+// ═══════ LADDER ══════════════════════════════════
+function switchLadder(b,el){
+  document.querySelectorAll('#lad-tabs .tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');ladBracket=b;ladPage=0;renderLadder();
+}
+
+function renderLadder(){
+  const all=CACHE[ladBracket]||[];
+  const sl=all.slice(ladPage*PAGE_SZ,(ladPage+1)*PAGE_SZ);
+  const body=document.getElementById('lad-body');
+  if(!sl.length){
+    body.innerHTML=`<tr><td colspan="11" style="text-align:center;padding:28px;color:var(--text3)">No data</td></tr>`;
+    document.getElementById('lad-pager').innerHTML='';return;
+  }
+  body.innerHTML=sl.map((e,i)=>{
+    const gi=ladPage*PAGE_SZ+i;
+    const name=e.character?.name||'—'; const realm=e.character?.realm?.slug||'';
+    const realmName=e.character?.realm?.name||realm;
+    const cls=cs(e.character?.playable_class?.name||'');
+    const spec=e.character?.specialization?.name||'';
+    const rat=e.rating||0; const rank=e.rank??gi+1;
+    const w=e.season_match_statistics?.won??0; const l=e.season_match_statistics?.lost??0;
+    const diff=ratingDiff(e,ladBracket);
+    const {label,cls:lsCls}=lastSeenLabel(e,ladBracket);
+    return `<tr onclick="openProfile('${realm}','${name.toLowerCase()}')">
+      <td class="td-rank ${rkCls(gi)}">${rank}</td>
+      <td><div class="cc"><div class="av-ph">${EMOJI[cls]||'⚔'}</div>
+        <div><div class="pname ${cls}">${name}</div><div class="psub">${realmName}</div></div>
+      </div></td>
+      <td class="td-spec">${spec||e.character?.playable_class?.name||'—'}</td>
+      <td class="td-realm">${realmName}</td>
+      <td class="td-rating ${rCls(rat)} r">${fmt(rat)}</td>
+      ${diffCell(diff)}
+      <td class="ww r">${w}</td><td class="ll r">${l}</td>
+      <td class="r" style="color:var(--text2)">${pct(w,l)}</td>
+      <td class="r" style="color:var(--text3);font-size:11px">${fmt(w+l)}</td>
+      <td class="td-lastseen ${lsCls} r">${label}</td>
+    </tr>`;
+  }).join('');
+  const pages=Math.ceil(all.length/PAGE_SZ);
+  document.getElementById('lad-pager').innerHTML=`
+    <button class="pager-btn" onclick="changeLadPage(-1)" ${ladPage===0?'disabled':''}>← Prev</button>
+    <span class="pager-info">Page ${ladPage+1} of ${pages} &nbsp;·&nbsp; ${fmt(all.length)} players</span>
+    <button class="pager-btn" onclick="changeLadPage(1)" ${ladPage>=pages-1?'disabled':''}>Next →</button>`;
+}
+
+function changeLadPage(d){ladPage+=d;renderLadder();window.scrollTo({top:0,behavior:'smooth'})}
+
+// ═══════ PROFILE ═════════════════════════════════
+async function openProfile(realm,name){
+  prevSec=document.querySelector('[id^=sec-]:not([style*=none])')?.id?.replace('sec-','')||'activity';
+  showSec('profile');
+  document.getElementById('prof-hero').innerHTML=`<div style="color:var(--text2);font-size:12px;padding:10px">Loading ${name}…</div>`;
+  document.getElementById('prof-bracks').innerHTML='';
+  document.getElementById('prof-tbl').innerHTML='';
+  try{
+    const [pr,pvpr]=await Promise.all([
+      fetch(`${BASE}/profile/wow/character/${realm}/${name}?namespace=${NS_PROF}&locale=en_GB`,{headers:{Authorization:`Bearer ${TOKEN}`}}),
+      fetch(`${BASE}/profile/wow/character/${realm}/${name}/pvp-summary?namespace=${NS_PROF}&locale=en_GB`,{headers:{Authorization:`Bearer ${TOKEN}`}})
+    ]);
+    const p=pr.ok?await pr.json():null;
+    const pvp=pvpr.ok?await pvpr.json():null;
+    if(!p)throw new Error('Character not found or profile is private');
+    const cls=cs(p.character_class?.name||'');
+    const avatar=p.id?`https://render.worldofwarcraft.com/eu/character/${realm}/${p.id}/avatar.jpg`:null;
+    const fact=p.faction?.type?.toLowerCase()||'';
+
+    // Last seen from leaderboard data
+    let lsHtml='';
+    for(const [b,entries] of Object.entries(CACHE)){
+      const e=entries.find(x=>x.character?.name?.toLowerCase()===name&&x.character?.realm?.slug===realm);
+      if(e){const{label,cls:lc}=lastSeenLabel(e,b);lsHtml+=`<span class="td-lastseen ${lc}" style="margin-right:10px">${BLABEL[b]}: ${label}</span>`;}
+    }
+
+    document.getElementById('nav-profile').style.display='';
+    document.getElementById('nav-profile').textContent=p.name;
+    document.getElementById('prof-hero').innerHTML=`
+      ${avatar?`<img class="profile-av" src="${avatar}" onerror="this.style.opacity=0.15" alt=""/>`:''}
+      <div>
+        <div class="profile-name ${cls}">${p.name}</div>
+        <div class="profile-meta">
+          <span class="${cls}">${p.character_class?.name||'—'}</span>
+          ${p.race?.name?' · '+p.race.name:''} · Level ${p.level||'—'} · ${p.realm?.name||realm}
+          ${fact?' · <span style="color:'+(fact==='horde'?'var(--horde)':'var(--ally)')+'">'+fact.charAt(0).toUpperCase()+fact.slice(1)+'</span>':''}
+        </div>
+        ${lsHtml?`<div class="profile-ls">${lsHtml}</div>`:''}
+      </div>`;
+    const bracks=pvp?.brackets||[];
+    document.getElementById('prof-bracks').innerHTML=bracks.slice(0,4).map(b=>{
+      const bn=BNAME[b.bracket?.type]||b.bracket?.type||'?';
+      const w=b.season_match_statistics?.won??0;const l=b.season_match_statistics?.lost??0;
+      return `<div class="brack-card"><div class="brack-r ${rCls(b.rating)}">${b.rating??'—'}</div><div class="brack-name">${bn}</div><div class="brack-wl">${w}W / ${l}L · ${pct(w,l)}</div></div>`;
+    }).join('')||'<div style="color:var(--text3);font-size:12px;padding:8px">No rated data this season</div>';
+    document.getElementById('prof-tbl').innerHTML=bracks.length
+      ?bracks.map(b=>{
+          const bn=BNAME[b.bracket?.type]||b.bracket?.type||b.bracket?.slug||'?';
+          const w=b.season_match_statistics?.won??0;const l=b.season_match_statistics?.lost??0;
+          // Rating diff from leaderboard snapshot
+          const bracket=Object.keys(BNAME).find(k=>BNAME[k]===bn)||null;
+          let diff=null;
+          if(bracket){
+            const le=(CACHE[bracket.toLowerCase().replace(' ','')]||[]).find(x=>x.character?.name?.toLowerCase()===name&&x.character?.realm?.slug===realm);
+            if(le)diff=ratingDiff(le,bracket.toLowerCase().replace(' ',''));
+          }
+          return `<tr><td style="color:var(--text2)">${bn}</td><td class="td-rating ${rCls(b.rating)} r">${b.rating??'—'}</td>${diffCell(diff)}<td class="ww r">${w}</td><td class="ll r">${l}</td><td class="r" style="color:var(--text2)">${pct(w,l)}</td><td class="r" style="color:var(--text3)">${fmt(w+l)}</td></tr>`;
+        }).join('')
+      :`<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text3)">No PvP bracket data</td></tr>`;
+  }catch(err){
+    document.getElementById('prof-hero').innerHTML=`<div style="color:var(--red);font-size:12px;padding:10px">⚠ ${err.message}</div>`;
+  }
+}
+
+function goBack(){showSec(prevSec)}
+
+// ═══════ SEARCH ══════════════════════════════════
+function openSearch(){document.getElementById('s-overlay').classList.add('open');setTimeout(()=>document.getElementById('s-inp').focus(),40)}
+function closeSearch(){document.getElementById('s-overlay').classList.remove('open');document.getElementById('s-inp').value='';document.getElementById('s-list').innerHTML='<div class="s-empty">Start typing to search EU ladder players</div>'}
+
+function runSearch(q){
+  const list=document.getElementById('s-list');
+  if(!q||q.length<2){list.innerHTML='<div class="s-empty">Type at least 2 characters</div>';return}
+  const hits=SEARCH_IDX.filter(x=>x.name.toLowerCase().includes(q.toLowerCase())).slice(0,15);
+  if(!hits.length){list.innerHTML='<div class="s-empty">No players found on EU ladders</div>';return}
+  list.innerHTML=hits.map(x=>{
+    const cls=cs(x.cls);
+    return `<div class="s-item" onclick="closeSearch();openProfile('${x.realm}','${x.name.toLowerCase()}')">
+      <div class="cdot dot-${cls}" style="width:8px;height:8px;border-radius:50%;flex-shrink:0"></div>
+      <div style="flex:1"><div class="pname ${cls}">${x.name}</div><div class="psub">${x.realmName} · ${x.cls}</div></div>
+      <div style="text-align:right"><div class="td-rating ${rCls(x.rating)}" style="font-size:.95rem">${fmt(x.rating)}</div><div style="font-size:9px;color:var(--text3)">${BLABEL[x.bracket]||x.bracket}</div></div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════ SECTIONS ════════════════════════════════
+function showSec(name){
+  ['activity','ladder','profile'].forEach(s=>{
+    document.getElementById(`sec-${s}`).style.display=s===name?'':'none';
+    const t=document.getElementById(`nav-${s}`);
+    if(t)t.classList.toggle('on',s===name);
+  });
+  if(name==='ladder')renderLadder();
+}
+
+// ═══════ KEYBOARD ════════════════════════════════
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();openSearch()}
+  if(e.key==='Escape')closeSearch();
+});
+
+// ═══════ AUTO REFRESH every 5 min ════════════════
+setInterval(async()=>{
+  if(!TOKEN)return;
+  Object.keys(CACHE).forEach(b=>{if(CACHE[b]?.length)saveSnap(b,CACHE[b]);});
+  LOADED={};CACHE={};SEARCH_IDX=[];
+  try{
+    TOKEN=await getToken();
+    await Promise.all(['3v3','2v2','rbg','shuffle','blitz'].map(b=>loadBracket(b).catch(()=>{})));
+    renderActivity();renderSideAll();renderGainersLosers();updateChips();
+    document.getElementById('chip-updated').textContent=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){}
+},5*60*1000);
+</script>
+</body>
+</html>
