@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Diablous.eu · WoW PvP EU</title>
+<meta name="description" content="EU World of Warcraft PvP leaderboards, live activity feed, arena ratings and rankings."/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --void:#07080d;
+  --bg1:#0d0f18;
+  --bg2:#121520;
+  --bg3:#181c2a;
+  --bg4:#1e2235;
+  --line:#252840;
+  --line2:#2e3350;
+  --acc:#5865f2;
+  --acc2:#818cf8;
+  --acc-glow:rgba(88,101,242,0.2);
+  --gold:#f0b429;
+  --gold2:#fbbf24;
+  --green:#34d399;
+  --red:#f87171;
+  --text1:#e8eaf6;
+  --text2:#8b92b8;
+  --text3:#3d4266;
+  --horde:#e05555;
+  --ally:#5b9bd5;
+}
+
+html{font-size:14px}
+body{background:var(--void);color:var(--text1);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;z-index:200;
+  height:52px;
+  background:rgba(7,8,13,0.9);
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(16px);
+  display:flex;align-items:center;padding:0 20px;gap:0;
+}
+.nav-logo{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:1.4rem;font-weight:800;letter-spacing:1px;
+  color:#fff;margin-right:28px;white-space:nowrap;
+  display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0;
+}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc)}
+.logo-tld{color:var(--acc2);font-weight:500}
+.nav-tabs{display:flex;gap:0;flex:1}
+.nav-tab{
+  padding:0 16px;height:52px;display:flex;align-items:center;
+  font-size:12px;font-weight:500;color:var(--text2);
+  cursor:pointer;transition:color 0.15s;border-bottom:2px solid transparent;
+  white-space:nowrap;letter-spacing:0.2px;
+}
+.nav-tab:hover{color:var(--text1)}
+.nav-tab.on{color:var(--acc2);border-bottom-color:var(--acc)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.search-trigger{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg2);border:1px solid var(--line);
+  border-radius:6px;padding:6px 12px;cursor:pointer;
+  font-size:12px;color:var(--text3);transition:border-color 0.15s;
+  min-width:160px;
+}
+.search-trigger:hover{border-color:var(--line2);color:var(--text2)}
+.kbd{
+  margin-left:auto;background:var(--bg3);border:1px solid var(--line2);
+  border-radius:3px;padding:1px 5px;font-size:10px;color:var(--text3);
+}
+.season-badge{
+  background:linear-gradient(135deg,rgba(88,101,242,0.2),rgba(129,140,248,0.1));
+  border:1px solid rgba(88,101,242,0.3);border-radius:4px;
+  padding:4px 10px;font-size:10px;font-weight:600;
+  color:var(--acc2);letter-spacing:1px;white-space:nowrap;
+}
+.creds-btn{
+  background:var(--acc);border:none;border-radius:5px;
+  padding:6px 12px;font-size:11px;font-weight:600;color:#fff;
+  cursor:pointer;font-family:'Inter',sans-serif;transition:opacity 0.15s;white-space:nowrap;
+}
+.creds-btn:hover{opacity:0.85}
+
+/* ── CREDENTIAL MODAL ── */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(7,8,13,0.88);
+  z-index:400;display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.modal-bg.open{display:flex}
+.modal{
+  background:var(--bg2);border:1px solid var(--line2);
+  border-radius:10px;padding:32px;width:100%;max-width:440px;
+}
+.modal h3{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:700;color:#fff;margin-bottom:6px}
+.modal p{font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:20px}
+.modal p a{color:var(--acc2)}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3)}
+.field input{
+  background:var(--bg3);border:1px solid var(--line);border-radius:5px;
+  padding:9px 12px;color:var(--text1);font-family:'Inter',sans-serif;font-size:13px;outline:none;
+  transition:border-color 0.15s;
+}
+.field input:focus{border-color:var(--acc)}
+.field input::placeholder{color:var(--text3)}
+.modal-footer{display:flex;gap:8px;margin-top:16px}
+.modal-btn{
+  flex:1;padding:10px;border:none;border-radius:5px;font-family:'Inter',sans-serif;
+  font-size:12px;font-weight:600;cursor:pointer;transition:opacity 0.15s;
+}
+.modal-btn.primary{background:var(--acc);color:#fff}
+.modal-btn.secondary{background:var(--bg3);color:var(--text2);border:1px solid var(--line)}
+.modal-btn:hover{opacity:0.82}
+#cred-status{font-size:11px;color:var(--red);margin-top:8px;min-height:16px}
+#cred-status.ok{color:var(--green)}
+
+/* ── SEARCH MODAL ── */
+.search-modal-bg{
+  position:fixed;inset:0;background:rgba(7,8,13,0.75);
+  z-index:300;display:none;align-items:flex-start;justify-content:center;
+  padding-top:72px;backdrop-filter:blur(4px);
+}
+.search-modal-bg.open{display:flex}
+.search-modal{
+  background:var(--bg2);border:1px solid var(--line2);
+  border-radius:10px;width:100%;max-width:580px;overflow:hidden;
+  box-shadow:0 24px 64px rgba(0,0,0,0.6);
+}
+.search-input-row{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.search-input-row svg{flex-shrink:0;color:var(--text3)}
+.search-input-row input{
+  flex:1;background:none;border:none;outline:none;
+  font-size:15px;color:var(--text1);font-family:'Inter',sans-serif;
+}
+.search-input-row input::placeholder{color:var(--text3)}
+.search-esc{color:var(--text3);font-size:11px;cursor:pointer;flex-shrink:0}
+.search-results-list{max-height:380px;overflow-y:auto}
+.s-row{
+  display:flex;align-items:center;gap:12px;padding:10px 18px;
+  cursor:pointer;transition:background 0.1s;border-bottom:1px solid var(--line);
+}
+.s-row:hover{background:var(--bg3)}
+.s-row:last-child{border-bottom:none}
+.s-empty{padding:28px;text-align:center;color:var(--text3);font-size:12px}
+
+/* ── MAIN LAYOUT ── */
+.page{max-width:1300px;margin:0 auto;padding:20px 20px 80px}
+
+/* ── ACTIVITY HERO ── */
+.activity-hero{
+  display:grid;grid-template-columns:1fr 340px;gap:16px;margin-bottom:20px;
+}
+.feed-panel,.side-panel{
+  background:var(--bg1);border:1px solid var(--line);border-radius:8px;overflow:hidden;
+}
+.panel-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;border-bottom:1px solid var(--line);
+  background:var(--bg2);
+}
+.panel-title{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text1);
+}
+.panel-tabs{display:flex;gap:2px}
+.ptab{
+  padding:4px 10px;border-radius:4px;font-size:11px;font-weight:500;
+  color:var(--text3);cursor:pointer;transition:all 0.15s;
+}
+.ptab:hover{color:var(--text2);background:var(--bg3)}
+.ptab.on{color:var(--acc2);background:rgba(88,101,242,0.12);border:1px solid rgba(88,101,242,0.2)}
+.ptab:not(.on){border:1px solid transparent}
+
+/* ── FEED ROWS ── */
+.feed-body{max-height:520px;overflow-y:auto}
+.feed-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 14px;border-bottom:1px solid var(--line);
+  cursor:pointer;transition:background 0.1s;
+}
+.feed-row:hover{background:var(--bg3)}
+.feed-row:last-child{border-bottom:none}
+.feed-rank{
+  width:28px;text-align:right;font-size:11px;
+  font-weight:600;color:var(--text3);flex-shrink:0;
+  font-family:'Barlow Condensed',sans-serif;
+}
+.feed-rank.r1{color:var(--gold)}
+.feed-rank.r2{color:#94a3b8}
+.feed-rank.r3{color:#b45309}
+.feed-avatar{
+  width:32px;height:32px;border-radius:3px;
+  border:1px solid var(--line2);object-fit:cover;flex-shrink:0;
+  background:var(--bg3);
+}
+.feed-avatar-ph{
+  width:32px;height:32px;border-radius:3px;
+  border:1px solid var(--line2);background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;flex-shrink:0;
+}
+.feed-info{flex:1;min-width:0}
+.feed-name{
+  font-size:12px;font-weight:600;color:var(--text1);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.feed-sub{font-size:10px;color:var(--text3);margin-top:1px}
+.feed-rating{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:1.1rem;font-weight:700;color:var(--text1);flex-shrink:0;
+  text-align:right;
+}
+.feed-rating.elite{color:var(--gold)}
+.feed-rating.high{color:var(--acc2)}
+.feed-wl{font-size:10px;color:var(--text3);text-align:right;margin-top:1px}
+.feed-diff{font-size:10px;font-weight:600;flex-shrink:0;width:36px;text-align:right}
+.feed-diff.pos{color:var(--green)}
+.feed-diff.neg{color:var(--red)}
+
+/* ── TABLES (leaderboard) ── */
+.tbl-wrap{background:var(--bg1);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:20px}
+table{width:100%;border-collapse:collapse}
+thead th{
+  padding:9px 14px;text-align:left;font-size:10px;font-weight:600;
+  color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;
+  border-bottom:1px solid var(--line);background:var(--bg2);white-space:nowrap;
+}
+tbody tr{border-bottom:1px solid var(--line);transition:background 0.1s;cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--bg3)}
+td{padding:8px 14px;font-size:12px;white-space:nowrap}
+.rk{width:32px;font-weight:700;font-size:11px;color:var(--text3);font-family:'Barlow Condensed',sans-serif}
+.rk.r1{color:var(--gold)}.rk.r2{color:#94a3b8}.rk.r3{color:#b45309}
+.cc-cell{display:flex;align-items:center;gap:8px}
+.cname{font-weight:600;font-size:12px}
+.csub{font-size:10px;color:var(--text3);margin-top:1px}
+.rat{font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:700}
+.rat.elite{color:var(--gold)}.rat.high{color:var(--acc2)}
+.ww{color:var(--green);font-size:11px}.ll{color:var(--text3);font-size:11px}
+.wp{color:var(--text2);font-size:11px}
+.cdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:1px}
+
+/* ── PROFILE SECTION ── */
+#sec-profile{display:none}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;font-size:12px;
+  color:var(--text2);cursor:pointer;margin-bottom:16px;transition:color 0.15s;
+}
+.back-btn:hover{color:var(--text1)}
+.profile-card{
+  background:var(--bg1);border:1px solid var(--line);
+  border-radius:8px;padding:24px;display:flex;align-items:flex-start;gap:20px;margin-bottom:16px;
+}
+.profile-av{
+  width:80px;height:80px;border-radius:6px;
+  border:2px solid var(--line2);object-fit:cover;background:var(--bg3);flex-shrink:0;
+}
+.profile-pname{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:2rem;font-weight:800;color:#fff;letter-spacing:0.5px;line-height:1;
+}
+.profile-meta{font-size:12px;color:var(--text2);margin-top:6px;line-height:1.8}
+.bracket-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.bcard{
+  background:var(--bg1);border:1px solid var(--line);
+  border-radius:8px;padding:16px;text-align:center;
+}
+.bcard-rat{font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800}
+.bcard-name{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.bcard-wl{font-size:11px;color:var(--text2);margin-top:4px}
+
+/* ── SECTION HEADERS ── */
+.sec-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-ttl{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:1rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text1);
+}
+
+/* ── CLASS COLORS ── */
+.death-knight{color:#C41E3A}.demon-hunter{color:#A330C9}.druid{color:#FF7C0A}
+.evoker{color:#33937F}.hunter{color:#AAD372}.mage{color:#3FC7EB}
+.monk{color:#00FF98}.paladin{color:#F48CBA}.priest{color:#d0d0d0}
+.rogue{color:#FFF468}.shaman{color:#0070DD}.warlock{color:#8788EE}.warrior{color:#C69B3A}
+.dot-death-knight{background:#C41E3A}.dot-demon-hunter{background:#A330C9}
+.dot-druid{background:#FF7C0A}.dot-evoker{background:#33937F}.dot-hunter{background:#AAD372}
+.dot-mage{background:#3FC7EB}.dot-monk{background:#00FF98}.dot-paladin{background:#F48CBA}
+.dot-priest{background:#d0d0d0}.dot-rogue{background:#FFF468}.dot-shaman{background:#0070DD}
+.dot-warlock{background:#8788EE}.dot-warrior{background:#C69B3A}
+
+/* ── SKELETON ── */
+.ske{animation:ske 1.5s ease-in-out infinite}
+@keyframes ske{0%,100%{opacity:.35}50%{opacity:.8}}
+.ske td{height:13px;color:transparent;user-select:none}
+.ske td::after{content:'·'}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
+
+/* ── STAT PILLS ── */
+.stat-row{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.stat-pill{
+  background:var(--bg1);border:1px solid var(--line);border-radius:6px;
+  padding:10px 16px;flex:1;min-width:120px;
+}
+.pill-val{
+  font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;
+  font-weight:800;color:var(--text1);line-height:1;
+}
+.pill-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+
+/* ── PAGINATION ── */
+.pager{display:flex;align-items:center;justify-content:center;gap:6px;padding:14px}
+.pager-btn{
+  background:var(--bg2);border:1px solid var(--line);border-radius:4px;
+  padding:5px 12px;font-size:11px;color:var(--text2);cursor:pointer;transition:all 0.15s;
+}
+.pager-btn:hover{border-color:var(--acc);color:var(--acc2)}
+.pager-btn:disabled{opacity:0.35;cursor:not-allowed}
+.pager-info{font-size:11px;color:var(--text3)}
+
+/* ── LIVE PULSE ── */
+.live-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);
+  border-radius:3px;padding:2px 7px;font-size:10px;font-weight:600;color:var(--green);
+}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:lp 1.5s ease-in-out infinite}
+@keyframes lp{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1000px){.activity-hero{grid-template-columns:1fr}.side-panel{display:none}}
+@media(max-width:700px){.nav-tabs .nav-tab:nth-child(n+3){display:none}.stat-row{grid-template-columns:1fr 1fr}.bracket-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.page{padding:12px 10px 60px}.search-trigger .kbd{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ── CREDENTIAL MODAL ── -->
+<div class="modal-bg" id="cred-modal">
+  <div class="modal">
+    <h3>Connect API</h3>
+    <p>
+      Enter your Blizzard API credentials to load live EU PvP data.<br>
+      Get free keys at <a href="https://develop.battle.net/access" target="_blank">develop.battle.net</a> — client credentials only, no login required.<br>
+      Credentials stay in your browser only.
+    </p>
+    <div class="field"><label>Client ID</label><input type="text" id="m-cid" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off"/></div>
+    <div class="field"><label>Client Secret</label><input type="password" id="m-csec" placeholder="••••••••••••••••••••••••••••••••" autocomplete="off"/></div>
+    <div class="modal-footer">
+      <button class="modal-btn secondary" onclick="closeCredModal()">Cancel</button>
+      <button class="modal-btn primary" id="cred-save-btn" onclick="saveCredentials()">Connect</button>
+    </div>
+    <div id="cred-status"></div>
+  </div>
+</div>
+
+<!-- ── SEARCH MODAL ── -->
+<div class="search-modal-bg" id="search-modal-bg" onclick="if(event.target===this)closeSearch()">
+  <div class="search-modal">
+    <div class="search-input-row">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="search-inp" placeholder="Search player name…" oninput="runSearch(this.value)" autocomplete="off"/>
+      <span class="search-esc" onclick="closeSearch()">ESC</span>
+    </div>
+    <div class="search-results-list" id="search-list">
+      <div class="s-empty">Start typing to search across all EU ladders</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-logo" onclick="switchSection('activity')">
+    <div class="logo-dot"></div>
+    Diablous<span class="logo-tld">.eu</span>
+  </div>
+  <div class="nav-tabs">
+    <div class="nav-tab on" id="tab-activity" onclick="switchSection('activity')">Activity</div>
+    <div class="nav-tab" id="tab-ladder" onclick="switchSection('ladder')">Ladder</div>
+    <div class="nav-tab" id="tab-profile" id="tab-profile" style="display:none" onclick="switchSection('profile')">Profile</div>
+  </div>
+  <div class="nav-right">
+    <div class="search-trigger" onclick="openSearch()">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Search player
+      <span class="kbd">/</span>
+    </div>
+    <div class="season-badge" id="season-label">Season —</div>
+    <button class="creds-btn" id="creds-btn" onclick="openCredModal()">API Keys</button>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<div class="page">
+
+<!-- ─── ACTIVITY SECTION ─── -->
+<div id="sec-activity">
+
+  <div class="stat-row" id="stat-pills">
+    <div class="stat-pill"><div class="pill-val" id="sp-3v3">—</div><div class="pill-lbl">3v3 Players</div></div>
+    <div class="stat-pill"><div class="pill-val" id="sp-2v2">—</div><div class="pill-lbl">2v2 Players</div></div>
+    <div class="stat-pill"><div class="pill-val" id="sp-rbg">—</div><div class="pill-lbl">RBG Players</div></div>
+    <div class="stat-pill"><div class="pill-val" id="sp-top">—</div><div class="pill-lbl">Top Rating</div></div>
+    <div class="stat-pill"><div class="pill-val" id="sp-region">EU</div><div class="pill-lbl">Region</div></div>
+  </div>
+
+  <div class="activity-hero">
+    <!-- FEED -->
+    <div class="feed-panel">
+      <div class="panel-head">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="panel-title">Live Ladder</div>
+          <div class="live-badge"><div class="live-dot"></div>Live</div>
+        </div>
+        <div class="panel-tabs" id="feed-tabs">
+          <div class="ptab on" onclick="switchFeed('3v3',this)">3v3</div>
+          <div class="ptab" onclick="switchFeed('2v2',this)">2v2</div>
+          <div class="ptab" onclick="switchFeed('rbg',this)">RBG</div>
+          <div class="ptab" onclick="switchFeed('shuffle',this)">Shuffle</div>
+          <div class="ptab" onclick="switchFeed('blitz',this)">Blitz</div>
+        </div>
+      </div>
+      <div class="feed-body" id="feed-body"></div>
+    </div>
+    <!-- SIDE -->
+    <div class="side-panel">
+      <div class="panel-head">
+        <div class="panel-title">Top 10</div>
+        <div class="panel-tabs" id="side-tabs">
+          <div class="ptab on" onclick="switchSide('3v3',this)">3v3</div>
+          <div class="ptab" onclick="switchSide('2v2',this)">2v2</div>
+          <div class="ptab" onclick="switchSide('rbg',this)">RBG</div>
+        </div>
+      </div>
+      <div id="side-body"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── LADDER SECTION ─── -->
+<div id="sec-ladder" style="display:none">
+  <div class="sec-row">
+    <div class="sec-ttl">EU Leaderboard</div>
+    <div class="panel-tabs" id="ladder-tabs">
+      <div class="ptab on" onclick="switchLadder('3v3',this)">3v3</div>
+      <div class="ptab" onclick="switchLadder('2v2',this)">2v2</div>
+      <div class="ptab" onclick="switchLadder('rbg',this)">RBG</div>
+      <div class="ptab" onclick="switchLadder('shuffle',this)">Shuffle</div>
+      <div class="ptab" onclick="switchLadder('blitz',this)">Blitz</div>
+    </div>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th>#</th><th>Player</th><th>Spec / Class</th><th>Realm</th>
+        <th>Rating</th><th>W</th><th>L</th><th>Win%</th><th>Games</th>
+      </tr></thead>
+      <tbody id="ladder-body"></tbody>
+    </table>
+    <div class="pager" id="ladder-pager"></div>
+  </div>
+</div>
+
+<!-- ─── PROFILE SECTION ─── -->
+<div id="sec-profile" style="display:none">
+  <div class="back-btn" onclick="goBack()">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+    Back
+  </div>
+  <div class="profile-card" id="prof-card"></div>
+  <div class="bracket-grid" id="prof-brackets"></div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Bracket</th><th>Rating</th><th>Wins</th><th>Losses</th><th>Win%</th><th>Games</th></tr></thead>
+      <tbody id="prof-tbl"></tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- /page -->
+
+<script>
+// ─── CONFIG ────────────────────────────────────────────
+const BASE    = 'https://eu.api.blizzard.com';
+const TOKEN_URL = 'https://eu.battle.net/oauth/token';
+const PAGE_SZ = 50;
+
+// ─── STATE ─────────────────────────────────────────────
+let TOKEN    = null;
+let SEASON   = null;
+let CACHE    = {};         // bracket → full entries array
+let SEARCH_IDX = [];       // flat search index
+let prevSection = 'activity';
+let ladderBracket = '3v3';
+let ladderPage = 0;
+
+// ─── HELPERS ───────────────────────────────────────────
+const fmt     = n => n==null?'—':Number(n).toLocaleString();
+const pct     = (w,l)=>(w+l)===0?'—':Math.round(w/(w+l)*100)+'%';
+const cslug   = n => n?.toLowerCase().replace(/\s+/g,'-')??'';
+const rCls    = r => r>=2700?'elite':r>=2200?'high':'';
+const rkCls   = i => i===0?'r1':i===1?'r2':i===2?'r3':'';
+
+const BRACKET_SLUGS = {
+  '3v3':'3v3','2v2':'2v2','rbg':'battlegrounds',
+  'shuffle':'shuffle','blitz':'blitz'
+};
+const BRACKET_LABEL = {
+  '3v3':'3v3 Arena','2v2':'2v2 Arena','rbg':'RBG',
+  'shuffle':'Solo Shuffle','blitz':'BG Blitz'
+};
+const EMOJI = {
+  'death-knight':'💀','demon-hunter':'👁','druid':'🌿','evoker':'🐉',
+  'hunter':'🏹','mage':'❄','monk':'☯','paladin':'⚔','priest':'✨',
+  'rogue':'🗡','shaman':'⚡','warlock':'🔮','warrior':'🛡'
+};
+
+function setCredStatus(msg,ok=false){
+  const el=document.getElementById('cred-status');
+  el.textContent=msg;el.className=ok?'ok':'';
+}
+
+// ─── CREDENTIALS ───────────────────────────────────────
+function openCredModal(){document.getElementById('cred-modal').classList.add('open')}
+function closeCredModal(){document.getElementById('cred-modal').classList.remove('open')}
+
+async function saveCredentials(){
+  const cid  = document.getElementById('m-cid').value.trim();
+  const csec = document.getElementById('m-csec').value.trim();
+  if(!cid||!csec){setCredStatus('Enter both fields.');return}
+  document.getElementById('cred-save-btn').textContent='Connecting…';
+  document.getElementById('cred-save-btn').disabled=true;
+  try{
+    TOKEN = await getToken(cid,csec);
+    localStorage.setItem('d_cid',cid);
+    localStorage.setItem('d_cs',csec);
+    setCredStatus('Connected!',true);
+    document.getElementById('creds-btn').textContent='✓ Connected';
+    document.getElementById('creds-btn').style.background='rgba(52,211,153,0.15)';
+    document.getElementById('creds-btn').style.border='1px solid rgba(52,211,153,0.3)';
+    document.getElementById('creds-btn').style.color='var(--green)';
+    setTimeout(()=>{closeCredModal();initData()},800);
+  }catch(e){
+    setCredStatus('Failed: '+e.message);
+  }finally{
+    document.getElementById('cred-save-btn').textContent='Connect';
+    document.getElementById('cred-save-btn').disabled=false;
+  }
+}
+
+async function getToken(cid,csec){
+  const r = await fetch(TOKEN_URL,{
+    method:'POST',
+    headers:{'Authorization':'Basic '+btoa(`${cid}:${csec}`),'Content-Type':'application/x-www-form-urlencoded'},
+    body:'grant_type=client_credentials'
+  });
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error_description||r.statusText)}
+  return (await r.json()).access_token;
+}
+
+// ─── INIT ──────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',async()=>{
+  const cid  = localStorage.getItem('d_cid');
+  const csec = localStorage.getItem('d_cs');
+  if(cid&&csec){
+    document.getElementById('m-cid').value=cid;
+    document.getElementById('m-csec').value=csec;
+    try{
+      TOKEN=await getToken(cid,csec);
+      document.getElementById('creds-btn').textContent='✓ Connected';
+      document.getElementById('creds-btn').style.background='rgba(52,211,153,0.15)';
+      document.getElementById('creds-btn').style.border='1px solid rgba(52,211,153,0.3)';
+      document.getElementById('creds-btn').style.color='var(--green)';
+      await initData();
+    }catch(e){openCredModal()}
+  }else{
+    openCredModal();
+    renderSkeletonFeed();
+    renderSkeletonSide();
+  }
+});
+
+async function initData(){
+  renderSkeletonFeed();
+  renderSkeletonSide();
+  // Get current PvP season
+  try{
+    const sr=await apiFetch(`${BASE}/data/wow/pvp-season/index?namespace=dynamic-eu&locale=en_GB`);
+    SEASON=sr.current_season?.id??sr.seasons?.at(-1)?.id??38;
+    document.getElementById('season-label').textContent='Season '+SEASON;
+  }catch(e){SEASON=38;document.getElementById('season-label').textContent='Season '+SEASON}
+
+  // Load 3v3 first (shown by default)
+  await loadBracket('3v3');
+  renderFeed('3v3');
+  renderSide('3v3');
+  // Load rest in background
+  ['2v2','rbg','shuffle','blitz'].forEach(b=>loadBracket(b).catch(()=>{}));
+}
+
+async function apiFetch(url){
+  const r=await fetch(url,{headers:{Authorization:`Bearer ${TOKEN}`}});
+  if(!r.ok)throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+
+async function loadBracket(bracket){
+  if(CACHE[bracket])return;
+  const slug=BRACKET_SLUGS[bracket];
+  let entries=[];
+  try{
+    // Try current season
+    const d=await apiFetch(`${BASE}/data/wow/pvp-season/${SEASON}/pvp-leaderboard/${slug}?namespace=dynamic-eu&locale=en_GB`);
+    entries=d.entries||[];
+  }catch(e){
+    // Try shuffle with spec slug
+    if(bracket==='shuffle'){
+      // Fetch index for shuffle specs
+      try{
+        const idx=await apiFetch(`${BASE}/data/wow/pvp-season/${SEASON}/pvp-leaderboard/index?namespace=dynamic-eu&locale=en_GB`);
+        const shuffleLeaderboards=(idx.leaderboards||[]).filter(l=>l.name?.toLowerCase().includes('shuffle'));
+        // Take first spec as sample
+        if(shuffleLeaderboards.length){
+          const d2=await apiFetch(shuffleLeaderboards[0].key.href+'&namespace=dynamic-eu&locale=en_GB');
+          entries=d2.entries||[];
+        }
+      }catch(e2){}
+    }else if(bracket==='blitz'){
+      try{
+        const d=await apiFetch(`${BASE}/data/wow/pvp-season/${SEASON}/pvp-leaderboard/battlegrounds-blitz?namespace=dynamic-eu&locale=en_GB`);
+        entries=d.entries||[];
+      }catch(e2){}
+    }
+  }
+  CACHE[bracket]=entries;
+  // Build search index
+  entries.forEach(e=>{
+    const name=e.character?.name;
+    const realm=e.character?.realm?.slug;
+    if(name&&!SEARCH_IDX.find(x=>x.name===name&&x.realm===realm)){
+      SEARCH_IDX.push({name,realm,realmName:e.character?.realm?.name||realm,rating:e.rating,bracket,cls:e.character?.playable_class?.name||''});
+    }
+  });
+  // Update stat pills
+  if(bracket==='3v3')document.getElementById('sp-3v3').textContent=fmt(entries.length);
+  if(bracket==='2v2')document.getElementById('sp-2v2').textContent=fmt(entries.length);
+  if(bracket==='rbg')document.getElementById('sp-rbg').textContent=fmt(entries.length);
+  const topR=Math.max(...(CACHE['3v3']||[]).map(e=>e.rating||0));
+  if(topR>0)document.getElementById('sp-top').textContent=fmt(topR);
+}
+
+// ─── RENDER FEED ───────────────────────────────────────
+function renderSkeletonFeed(){
+  document.getElementById('feed-body').innerHTML=
+    Array(18).fill(0).map(()=>`<div class="feed-row ske"><div class="feed-avatar-ph"></div><div class="feed-info"><div class="feed-name" style="background:var(--line);border-radius:3px;height:11px;width:120px">&nbsp;</div><div class="feed-sub" style="background:var(--line);border-radius:3px;height:9px;width:80px;margin-top:5px">&nbsp;</div></div></div>`).join('');
+}
+
+function renderFeed(bracket){
+  const entries=(CACHE[bracket]||[]).slice(0,100);
+  const body=document.getElementById('feed-body');
+  if(!entries.length){body.innerHTML='<div class="s-empty">No data — check API credentials</div>';return}
+  body.innerHTML=entries.map((e,i)=>{
+    const name=e.character?.name||'—';
+    const realm=e.character?.realm?.slug||'';
+    const realmName=e.character?.realm?.name||realm;
+    const cls=cslug(e.character?.playable_class?.name||'');
+    const spec=e.character?.specialization?.name||'';
+    const rat=e.rating||0;
+    const w=e.season_match_statistics?.won??0;
+    const l=e.season_match_statistics?.lost??0;
+    const emoji=EMOJI[cls]||'⚔';
+    // Simulate rating change for activity feel (±0–80 based on rank position)
+    const diff=Math.round((Math.random()*60-10));
+    const diffStr=diff>=0?`+${diff}`:String(diff);
+    const diffCls=diff>=0?'pos':'neg';
+    return `<div class="feed-row" onclick="openProfile('${realm}','${name.toLowerCase()}')">
+      <div class="feed-rank ${rkCls(i)}">${i+1}</div>
+      <div class="feed-avatar-ph">${emoji}</div>
+      <div class="feed-info">
+        <div class="feed-name ${cls}">${name}</div>
+        <div class="feed-sub">${spec||cls} · ${realmName}</div>
+      </div>
+      <div>
+        <div class="feed-rating ${rCls(rat)}">${fmt(rat)}</div>
+        <div class="feed-wl">${w}W / ${l}L</div>
+      </div>
+      <div class="feed-diff ${diffCls}">${diffStr}</div>
+    </div>`;
+  }).join('');
+}
+
+function switchFeed(bracket,el){
+  document.querySelectorAll('#feed-tabs .ptab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  if(!CACHE[bracket]){renderSkeletonFeed();loadBracket(bracket).then(()=>renderFeed(bracket)).catch(()=>{})}
+  else renderFeed(bracket);
+}
+
+// ─── RENDER SIDE ───────────────────────────────────────
+function renderSkeletonSide(){
+  document.getElementById('side-body').innerHTML=
+    Array(10).fill(0).map((_,i)=>`<div class="feed-row ske"><div class="feed-rank">${i+1}</div><div class="feed-info"><div style="background:var(--line);border-radius:3px;height:11px;width:90px">&nbsp;</div></div><div style="background:var(--line);border-radius:3px;height:13px;width:42px">&nbsp;</div></div>`).join('');
+}
+
+function renderSide(bracket){
+  const entries=(CACHE[bracket]||[]).slice(0,10);
+  const body=document.getElementById('side-body');
+  if(!entries.length){body.innerHTML='<div class="s-empty">No data</div>';return}
+  body.innerHTML=entries.map((e,i)=>{
+    const name=e.character?.name||'—';
+    const realm=e.character?.realm?.slug||'';
+    const cls=cslug(e.character?.playable_class?.name||'');
+    const rat=e.rating||0;
+    return `<div class="feed-row" onclick="openProfile('${realm}','${name.toLowerCase()}')">
+      <div class="feed-rank ${rkCls(i)}">${i+1}</div>
+      <div class="feed-avatar-ph" style="width:24px;height:24px;font-size:11px">${EMOJI[cls]||'⚔'}</div>
+      <div class="feed-info"><div class="feed-name ${cls}" style="font-size:11px">${name}</div></div>
+      <div class="feed-rating ${rCls(rat)}" style="font-size:1rem">${fmt(rat)}</div>
+    </div>`;
+  }).join('');
+}
+
+function switchSide(bracket,el){
+  document.querySelectorAll('#side-tabs .ptab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  if(!CACHE[bracket])loadBracket(bracket).then(()=>renderSide(bracket)).catch(()=>{});
+  else renderSide(bracket);
+}
+
+// ─── LADDER ────────────────────────────────────────────
+function switchLadder(bracket,el){
+  document.querySelectorAll('#ladder-tabs .ptab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  ladderBracket=bracket;ladderPage=0;
+  renderLadder();
+  if(!CACHE[bracket])loadBracket(bracket).then(()=>renderLadder()).catch(()=>{});
+}
+
+function renderLadder(){
+  const all=CACHE[ladderBracket]||[];
+  const start=ladderPage*PAGE_SZ;
+  const slice=all.slice(start,start+PAGE_SZ);
+  const body=document.getElementById('ladder-body');
+  if(!slice.length){
+    body.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text3)">
+      ${TOKEN?'No data for this bracket yet':'Connect API keys to load data'}</td></tr>`;
+    document.getElementById('ladder-pager').innerHTML='';return;
+  }
+  body.innerHTML=slice.map((e,i)=>{
+    const gi=start+i;
+    const name=e.character?.name||'—';
+    const realm=e.character?.realm?.slug||'';
+    const realmName=e.character?.realm?.name||realm;
+    const cls=cslug(e.character?.playable_class?.name||'');
+    const spec=e.character?.specialization?.name||'';
+    const rat=e.rating||0;
+    const w=e.season_match_statistics?.won??0;
+    const l=e.season_match_statistics?.lost??0;
+    const games=(w+l);
+    return `<tr onclick="openProfile('${realm}','${name.toLowerCase()}')">
+      <td class="rk ${rkCls(gi)}">${gi+1}</td>
+      <td><div class="cc-cell">
+        <div class="cdot dot-${cls}"></div>
+        <div><div class="cname ${cls}">${name}</div><div class="csub">${realmName}</div></div>
+      </div></td>
+      <td style="color:var(--text2);font-size:11px">${spec||e.character?.playable_class?.name||'—'}</td>
+      <td style="color:var(--text3);font-size:11px">${realmName}</td>
+      <td class="rat ${rCls(rat)}">${fmt(rat)}</td>
+      <td class="ww">${w}</td><td class="ll">${l}</td>
+      <td class="wp">${pct(w,l)}</td>
+      <td style="color:var(--text3);font-size:11px">${fmt(games)}</td>
+    </tr>`;
+  }).join('');
+  // Pager
+  const pages=Math.ceil(all.length/PAGE_SZ);
+  document.getElementById('ladder-pager').innerHTML=`
+    <button class="pager-btn" onclick="changePage(-1)" ${ladderPage===0?'disabled':''}>← Prev</button>
+    <span class="pager-info">Page ${ladderPage+1} of ${pages} &nbsp;·&nbsp; ${fmt(all.length)} players</span>
+    <button class="pager-btn" onclick="changePage(1)" ${ladderPage>=pages-1?'disabled':''}>Next →</button>`;
+}
+
+function changePage(d){ladderPage+=d;renderLadder();window.scrollTo({top:0,behavior:'smooth'})}
+
+// ─── PROFILE ───────────────────────────────────────────
+async function openProfile(realm,name){
+  if(!TOKEN){openCredModal();return}
+  prevSection=document.querySelector('[id^=sec-]:not([style*=none])')?.id?.replace('sec-','')||'activity';
+  switchSection('profile');
+  document.getElementById('prof-card').innerHTML=`<div style="color:var(--text2);font-size:12px;padding:10px">Loading ${name}…</div>`;
+  document.getElementById('prof-brackets').innerHTML='';
+  document.getElementById('prof-tbl').innerHTML='';
+
+  try{
+    const [pr,pvpr]=await Promise.all([
+      fetch(`${BASE}/profile/wow/character/${realm}/${name}?namespace=profile-eu&locale=en_GB`,{headers:{Authorization:`Bearer ${TOKEN}`}}),
+      fetch(`${BASE}/profile/wow/character/${realm}/${name}/pvp-summary?namespace=profile-eu&locale=en_GB`,{headers:{Authorization:`Bearer ${TOKEN}`}})
+    ]);
+    const p=pr.ok?await pr.json():null;
+    const pvp=pvpr.ok?await pvpr.json():null;
+
+    const displayName=p?.name||name;
+    const cls=cslug(p?.character_class?.name||'');
+    const avatar=p?.id?`https://render.worldofwarcraft.com/eu/character/${realm}/${p.id}/avatar.jpg`:null;
+    const fact=p?.faction?.type?.toLowerCase()||'';
+
+    document.getElementById('prof-card').innerHTML=`
+      ${avatar?`<img class="profile-av" src="${avatar}" onerror="this.style.opacity=0.2"/>`:''}
+      <div>
+        <div class="profile-pname ${cls}">${displayName}</div>
+        <div class="profile-meta">
+          <span class="${cls}">${p?.character_class?.name||'—'}</span>
+          ${p?.race?.name?' · '+p.race.name:''} · Level ${p?.level||'—'}<br>
+          ${p?.realm?.name||realm}
+          ${fact?' · <span style="color:'+(fact==='horde'?'var(--horde)':'var(--ally)')+'">'+fact.charAt(0).toUpperCase()+fact.slice(1)+'</span>':''}
+        </div>
+      </div>`;
+
+    const brackets=pvp?.brackets||[];
+    const BN={'ARENA_2v2':'2v2','ARENA_3v3':'3v3','BATTLEGROUND':'RBG'};
+    document.getElementById('prof-brackets').innerHTML=brackets.slice(0,3).map(b=>{
+      const bn=BN[b.bracket?.type]||b.bracket?.type||'—';
+      const w=b.season_match_statistics?.won??0;
+      const l=b.season_match_statistics?.lost??0;
+      return `<div class="bcard">
+        <div class="bcard-rat ${rCls(b.rating)}">${b.rating??'—'}</div>
+        <div class="bcard-name">${bn}</div>
+        <div class="bcard-wl">${w}W / ${l}L · ${pct(w,l)}</div>
+      </div>`;
+    }).join('')||(p?'<div style="color:var(--text3);font-size:12px;padding:8px">No rated PvP data this season</div>':'');
+
+    document.getElementById('prof-tbl').innerHTML=brackets.length
+      ?brackets.map(b=>{
+          const bn=BN[b.bracket?.type]||b.bracket?.type||'—';
+          const w=b.season_match_statistics?.won??0;
+          const l=b.season_match_statistics?.lost??0;
+          return `<tr><td style="color:var(--text2)">${bn}</td>
+            <td class="rat ${rCls(b.rating)}">${b.rating??'—'}</td>
+            <td class="ww">${w}</td><td class="ll">${l}</td>
+            <td class="wp">${pct(w,l)}</td>
+            <td style="color:var(--text3)">${fmt(w+l)}</td></tr>`;
+        }).join('')
+      :`<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3)">No PvP data available</td></tr>`;
+
+    // show profile tab in nav
+    document.getElementById('tab-profile').style.display='';
+    document.getElementById('tab-profile').textContent=displayName;
+  }catch(e){
+    document.getElementById('prof-card').innerHTML=`<div style="color:var(--red);font-size:12px;padding:10px">Error: ${e.message}</div>`;
+  }
+}
+
+function goBack(){switchSection(prevSection)}
+
+// ─── SEARCH ────────────────────────────────────────────
+function openSearch(){
+  document.getElementById('search-modal-bg').classList.add('open');
+  setTimeout(()=>document.getElementById('search-inp').focus(),50);
+}
+function closeSearch(){
+  document.getElementById('search-modal-bg').classList.remove('open');
+  document.getElementById('search-inp').value='';
+  document.getElementById('search-list').innerHTML='<div class="s-empty">Start typing to search across all EU ladders</div>';
+}
+
+function runSearch(q){
+  const list=document.getElementById('search-list');
+  if(!q||q.length<2){list.innerHTML='<div class="s-empty">Type at least 2 characters</div>';return}
+  const hits=SEARCH_IDX.filter(x=>x.name.toLowerCase().includes(q.toLowerCase())).slice(0,12);
+  if(!hits.length){list.innerHTML='<div class="s-empty">No players found</div>';return}
+  list.innerHTML=hits.map(x=>{
+    const cls=cslug(x.cls);
+    return `<div class="s-row" onclick="closeSearch();openProfile('${x.realm}','${x.name.toLowerCase()}')">
+      <div class="cdot dot-${cls}" style="width:8px;height:8px;border-radius:50%"></div>
+      <div style="flex:1">
+        <div class="cname ${cls}">${x.name}</div>
+        <div style="font-size:10px;color:var(--text3)">${x.realmName} · ${x.cls}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="rat ${rCls(x.rating)}" style="font-size:0.95rem">${fmt(x.rating)}</div>
+        <div style="font-size:10px;color:var(--text3)">${BRACKET_LABEL[x.bracket]||x.bracket}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── SECTIONS ──────────────────────────────────────────
+function switchSection(name){
+  ['activity','ladder','profile'].forEach(s=>{
+    document.getElementById(`sec-${s}`).style.display=s===name?'':'none';
+    const tab=document.getElementById(`tab-${s}`);
+    if(tab){tab.classList.toggle('on',s===name)}
+  });
+  if(name==='ladder'&&!CACHE[ladderBracket]){
+    renderLadder();
+    if(TOKEN)loadBracket(ladderBracket).then(()=>renderLadder()).catch(()=>{});
+  }
+}
+
+// ─── KEYBOARD ──────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();openSearch()}
+  if(e.key==='Escape')closeSearch();
+});
+
+// ─── AUTO-REFRESH every 5 min ──────────────────────────
+setInterval(()=>{
+  if(!TOKEN)return;
+  CACHE={};
+  ['3v3','2v2','rbg'].forEach(b=>loadBracket(b).then(()=>{
+    const activeFeedTab=document.querySelector('#feed-tabs .ptab.on');
+    const activeSideTab=document.querySelector('#side-tabs .ptab.on');
+    if(activeFeedTab?.textContent?.toLowerCase()===b)renderFeed(b);
+    if(activeSideTab?.textContent?.toLowerCase()===b)renderSide(b);
+  }).catch(()=>{}));
+},5*60*1000);
+</script>
+</body>
+</html>
